@@ -23,10 +23,17 @@ public class PostLikeTests {
 //            postLikeRequestDTO.setMemberId(memberId);
 //            postLikeService.likePost(postLikeRequestDTO);
 //        }
-        PostLikeRequestDTO postLikeRequestDTO = new PostLikeRequestDTO();
-        postLikeRequestDTO.setPostId(1L);
-        postLikeRequestDTO.setMemberId(1L);
-        postLikeService.likePost(postLikeRequestDTO);
+
+
+//        for(Long i = 0L; i < 10; i++) {
+//            for(Long j = 0L; j < 20; j++) {
+//                if(Math.random() < 0.5) {
+//                    PostLikeRequestDTO postLikeRequestDTO = new PostLikeRequestDTO();
+//                    postLikeRequestDTO.setPostId(j);
+//                    postLikeRequestDTO.setMemberId(i);
+//                }
+//            }
+//        }
     }
 
     @Test
