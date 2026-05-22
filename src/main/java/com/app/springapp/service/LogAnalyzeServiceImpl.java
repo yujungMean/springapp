@@ -157,7 +157,7 @@ public class LogAnalyzeServiceImpl implements LogAnalyzeService {
             logMapper.selectById(logId).orElseThrow(() -> new RuntimeException("로그를 찾을 수 없습니다."));
 
         // 2. 분석 결과 (TBL_LOG_RESULT) 조회
-        LogResultVO aiResult = logResultMapper.findByLogId(logId).orElse(null);
+        LogResultVO aiResult = logResultMapper.findByLogId(logId);
 
         // 3. 응답 DTO 조립
         com.app.springapp.domain.dto.response.LogAnalyzeResultResponseDTO responseDto = 
