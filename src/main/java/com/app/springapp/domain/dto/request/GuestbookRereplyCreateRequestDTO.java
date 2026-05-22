@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GuestbookRereplyCreateRequestDTO {
 
-    public Long id;
+    private Long id;
     private Long guestbookReplyId;
     private String guestbookRereplyContent;
     private Long writerMemberId;

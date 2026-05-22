@@ -2,46 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.springapp.mapper.GuestbookRereplyMapper">
 
-<!--    댓글 작성 (insertReply)-->
     <insert id="insertRereply" parameterType="GuestbookRereplyCreateRequestDTO">
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
-            SELECT SEQ_GUESTBOOK_REPLY.NEXTVAL FROM DUAL
+            SELECT SEQ_GUESTBOOK_REREPLY.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_GUESTBOOK_REPLY (ID, GUESTBOOK_REPLY_CONTENT, GUESTBOOK_ID, WRITER_MEMBER_ID)
-        VALUES (#{id}, #{guestbookReplyContent}, #{guestbookId}, #{writerMemberId})
+        INSERT INTO TBL_GUESTBOOK_REREPLY (ID, GUESTBOOK_REREPLY_CONTENT, GUESTBOOK_REPLY_ID, WRITER_MEMBER_ID)
+        VALUES (#{id}, #{guestbookRereplyContent}, #{guestbookReplyId}, #{writerMemberId})
     </insert>
 
-<!--    특정 방명록의 댓글 목록 조회 (selectRepliesByGuestbookId)-->
-
-    <select id="selectRerepliesByGuestbookId" parameterType="Long" resultType="GuestbookRereplyResponseDTO">
+    <select id="selectRerepliesByGuestbookReplyId" parameterType="Long" resultType="GuestbookRereplyResponseDTO">
         SELECT  TBRP.ID,
-                TBRP.GUESTBOOK_REPLY_CONTENT,
-                TBRP.GUESTBOOK_REPLY_CREATED_AT,
-                TBRP.GUESTBOOK_ID,
-                TBRP.WRITER_MEMBER_ID,
-                TBM.MEMBER_NICKNAME          AS WRITER_NICKNAME,
-                TBM.MEMBER_PROFILE_IMAGE_URL AS WRITER_PROFILE_IMAGE_URL,
-                (SELECT COUNT(*) FROM TBL_GUESTBOOK_REPLY_LIKE TBRPL
-        WHERE TBRPL.GUESTBOOK_REPLY_ID = TBRP.ID) AS LIKE_COUNT
-        FROM TBL_GUESTBOOK_REPLY TBRP
+        TBRP.GUESTBOOK_REREPLY_CONTENT,
+        TBRP.GUESTBOOK_REREPLY_CREATED_AT,
+        TBRP.GUESTBOOK_REPLY_ID,
+        TBRP.WRITER_MEMBER_ID,
+        TBM.MEMBER_NICKNAME          AS WRITER_NICKNAME,
+        TBM.MEMBER_PROFILE_IMAGE_URL AS WRITER_PROFILE_IMAGE_URL,
+        (SELECT COUNT(*) FROM TBL_GUESTBOOK_REREPLY_LIKE TBRPL
+        WHERE TBRPL.GUESTBOOK_REREPLY_ID = TBRP.ID) AS LIKE_COUNT
+        FROM TBL_GUESTBOOK_REREPLY TBRP
         JOIN TBL_MEMBER TBM ON TBRP.WRITER_MEMBER_ID = TBM.ID
-        WHERE TBRP.GUESTBOOK_ID = #{guestbookId}
-        ORDER BY TBRP.GUESTBOOK_REPLY_CREATED_AT ASC
+        WHERE TBRP.GUESTBOOK_REPLY_ID = #{guestbookReplyId}
+        ORDER BY TBRP.GUESTBOOK_REREPLY_CREATED_AT ASC
     </select>
 
-<!--  댓글 수정  -->
-
     <update id="updateGuestbookRereplyContentByWriterMemberId" parameterType="GuestbookRereplyVO">
-        UPDATE TBL_GUESTBOOK_REPLY
-        SET GUESTBOOK_REPLY_CONTENT = #{guestbookReplyContent}
+        UPDATE TBL_GUESTBOOK_REREPLY
+        SET GUESTBOOK_REREPLY_CONTENT = #{guestbookRereplyContent}
         WHERE ID = #{id}
         AND WRITER_MEMBER_ID = #{writerMemberId}
     </update>
 
-    <!--    댓글 삭제 (deleteReply)-->
     <delete id="deleteRereply" parameterType="GuestbookRereplyVO">
-        DELETE FROM TBL_GUESTBOOK_REPLY
+        DELETE FROM TBL_GUESTBOOK_REREPLY
         WHERE ID = #{id}
-        AND (WRITER_MEMBER_ID = #{writerMemberId})
+        AND WRITER_MEMBER_ID = #{writerMemberId}
     </delete>
+
 </mapper>

@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class GuestbookRereplyResponseDTO {
 
-    public Long id;
-    public String guestbookRereplyContent;
-    public String guestbookRereplyCreatedAt;
-    public Long guestbookReplyId;
-    public Long writerMemberId;
-    public String writerNickname;
-    public String writerProfileImageUrl;
+    private Long id;
+    private String guestbookRereplyContent;
+    private String guestbookRereplyCreatedAt;
+    private Long likeCount;
+    private Long guestbookReplyId;
+    private Long writerMemberId;
+    private String writerNickname;
+    private String writerProfileImageUrl;
 
 }
