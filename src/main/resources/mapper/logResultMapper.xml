@@ -24,7 +24,7 @@
             LOG_RESULT_LOG_EXTERNAL_FACTOR  AS logResultLogExternalFactor,
             LOG_RESULT_LOG_INTERNAL_FACTOR  AS logResultLogInternalFactor
         FROM TBL_LOG_RESULT
-        WHERE LOG_ID = #{logId}
+        WHERE LOG_ID = #{logId}git sta
     </select>
 
     <!-- 분석 결과 ID로 조회 -->
