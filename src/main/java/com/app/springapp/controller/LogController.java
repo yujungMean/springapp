@@ -72,17 +72,5 @@ public class LogController {
         return ResponseEntity.ok(logService.getLog(id));
     }
 
-    // 로그 수정
-    @Operation(summary = "로그 수정", description = "페일로그 내용을 수정합니다.")
-    @PutMapping
-    public ResponseEntity<ApiResponseDTO> updateLog(@RequestBody LogUpdateRequestDTO dto) {
-        return ResponseEntity.ok(logService.updateLog(dto, 1L)); // 로그인 구현 후 memberId 교체
-    }
 
-    // 로그 삭제
-    @Operation(summary = "로그 삭제", description = "페일로그를 소프트 델리트합니다.")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO> deleteLog(@PathVariable Long id) {
-        return ResponseEntity.ok(logService.deleteLog(id, 1L)); // 로그인 구현 후 memberId 교체
-    }
 }

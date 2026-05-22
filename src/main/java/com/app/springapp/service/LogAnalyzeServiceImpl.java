@@ -5,6 +5,11 @@ import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.LangchainResponseDTO;
 import com.app.springapp.domain.vo.*;
 import com.app.springapp.mapper.*;
+import com.app.springapp.constant.LogPromptConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -26,9 +33,13 @@ public class LogAnalyzeServiceImpl implements LogAnalyzeService {
     private final RadarScoreMapper radarScoreMapper;
     private final LogPatternMapper logPatternMapper;
     private final LogActionPlanMapper logActionPlanMapper;
+    private final ObjectMapper objectMapper;
 
     @Value("${langchain.server.url:http://localhost:8000}")
     private String langchainServerUrl;
+
+    @Value("${openai.api-key}")
+    private String openAiApiKey;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -36,27 +47,77 @@ public class LogAnalyzeServiceImpl implements LogAnalyzeService {
         RestTemplate restTemplate = new RestTemplate();
         String url = langchainServerUrl + "/api/analyze";
 
-        // 1. LangChain API 요청 파라미터 구성
+        // 1. LangChain API 요청 파라미터 구성 (Python에 필요한 필드만 전송)
         Map<String, Object> payload = new HashMap<>();
         payload.put("title", request.getTitle());
         payload.put("category", request.getCategory());
         payload.put("vision", request.getVision());
         payload.put("content", request.getContent());
-        payload.put("style", request.getStyle());
-        payload.put("pastLogs", request.getPastLogs());
+        // style이 null이면 Python Pydantic이 422를 반환하므로 기본값 보장
+        payload.put("style", request.getStyle() != null ? request.getStyle() : "objective");
+        
+        String pastLogsStr = "없음";
+        if (request.getPastLogs() != null && !request.getPastLogs().isEmpty()) {
+            pastLogsStr = String.join("\n", request.getPastLogs());
+            payload.put("pastLogs", request.getPastLogs());
+        } else {
+            payload.put("pastLogs", java.util.Collections.emptyList());
+        }
 
         log.info("Sending request to LangChain: {}", payload);
 
+        LangchainResponseDTO aiResult = null;
         try {
-            // 2. LangChain 호출
+            // 2. LangChain 호출 시도
             ResponseEntity<LangchainResponseDTO> response = restTemplate.postForEntity(url, payload, LangchainResponseDTO.class);
-            LangchainResponseDTO aiResult = response.getBody();
-
+            aiResult = response.getBody();
             if (aiResult == null) {
                 throw new RuntimeException("LangChain 응답이 비어있습니다.");
             }
+        } catch (Exception ex) {
+            log.warn("Python LangChain server failed or unreachable. Falling back to Spring Boot OpenAI API...", ex);
+            // 3. Fallback: Spring Boot에서 직접 OpenAI 호출
+            try {
+                OpenAiService openAiService = new OpenAiService(openAiApiKey);
+                
+                String guideline = LogPromptConstants.getStyleGuideline((String) payload.get("style"));
+                String systemPrompt = LogPromptConstants.getSystemTemplate(guideline);
+                String humanPrompt = LogPromptConstants.getHumanTemplate(
+                    (String) payload.get("title"),
+                    (String) payload.get("category"),
+                    (String) payload.get("vision"),
+                    (String) payload.get("content"),
+                    pastLogsStr
+                );
 
-            // 3. 로그 마스터 테이블 (TBL_LOG) 저장 (상태는 PUBLISHED)
+                List<ChatMessage> messages = new ArrayList<>();
+                messages.add(new ChatMessage("system", systemPrompt));
+                messages.add(new ChatMessage("user", humanPrompt));
+
+                ChatCompletionRequest completionRequest = ChatCompletionRequest.builder()
+                        .model("gpt-4o-mini") // Python과 동일
+                        .messages(messages)
+                        .temperature(0.7)
+                        .build();
+
+                String aiResponseStr = openAiService.createChatCompletion(completionRequest)
+                        .getChoices().get(0).getMessage().getContent();
+                
+                aiResult = objectMapper.readValue(aiResponseStr, LangchainResponseDTO.class);
+
+            } catch (Exception fallbackEx) {
+                log.error("Fallback OpenAI API 연동 중 오류 발생", fallbackEx);
+                throw new RuntimeException("로그 분석에 실패했습니다. (Fallback 서버 오류)", fallbackEx);
+            }
+        }
+
+        try {
+            // 4. 로그 마스터 테이블 (TBL_LOG) 저장 (상태는 PUBLISHED)
+            // categoryId가 null이면 DB에서 ORA-01400 에러 발생하므로 방어 처리
+            if (request.getCategoryId() == null) {
+                throw new RuntimeException("카테고리가 선택되지 않았습니다. Step 1에서 카테고리를 선택해주세요.");
+            }
+            
             LogVO logVO = new LogVO();
             logVO.setLogTitle(request.getTitle());
             logVO.setVisionTitle(request.getVision());
@@ -115,29 +176,31 @@ public class LogAnalyzeServiceImpl implements LogAnalyzeService {
 
             // 7. 액션 플랜 (TBL_LOG_ACTION_PLAN) 저장
             if (aiResult.getActionPlans() != null) {
-                // TRY 플랜
-                if (aiResult.getActionPlans().getTryPlan() != null) {
-                    LangchainResponseDTO.TryPlanDTO tp = aiResult.getActionPlans().getTryPlan();
-                    LogActionPlanVO tryPlanVO = new LogActionPlanVO();
-                    tryPlanVO.setLogActionPlanType("TRY");
-                    tryPlanVO.setLogActionPlanTitle(tp.getTitle());
-                    tryPlanVO.setLogActionPlanContent(tp.getContent());
-                    tryPlanVO.setLogResultId(savedResultId);
-                    logActionPlanMapper.insert(tryPlanVO);
+                // TRY 플랜 배열 저장
+                if (aiResult.getActionPlans().getTryPlans() != null) {
+                    for (LangchainResponseDTO.TryPlanDTO tp : aiResult.getActionPlans().getTryPlans()) {
+                        LogActionPlanVO tryPlanVO = new LogActionPlanVO();
+                        tryPlanVO.setLogActionPlanType("TRY");
+                        tryPlanVO.setLogActionPlanTitle(tp.getTitle());
+                        tryPlanVO.setLogActionPlanContent(tp.getContent());
+                        tryPlanVO.setLogResultId(savedResultId);
+                        logActionPlanMapper.insert(tryPlanVO);
+                    }
                 }
 
-                // CHANGE 플랜
-                if (aiResult.getActionPlans().getChangePlan() != null) {
-                    LangchainResponseDTO.ChangePlanDTO cp = aiResult.getActionPlans().getChangePlan();
-                    LogActionPlanVO changePlanVO = new LogActionPlanVO();
-                    changePlanVO.setLogActionPlanType("CHANGE");
-                    changePlanVO.setLogActionPlanTitle(cp.getTitle());
-                    changePlanVO.setLogActionPlanCurrentPattern(cp.getCurrentPattern());
-                    changePlanVO.setLogActionPlanCurrentContent(cp.getCurrentContent());
-                    changePlanVO.setLogActionPlanImprovedPattern(cp.getImprovedPattern());
-                    changePlanVO.setLogActionPlanImprovedContent(cp.getImprovedContent());
-                    changePlanVO.setLogResultId(savedResultId);
-                    logActionPlanMapper.insert(changePlanVO);
+                // CHANGE 플랜 배열 저장
+                if (aiResult.getActionPlans().getChangePlans() != null) {
+                    for (LangchainResponseDTO.ChangePlanDTO cp : aiResult.getActionPlans().getChangePlans()) {
+                        LogActionPlanVO changePlanVO = new LogActionPlanVO();
+                        changePlanVO.setLogActionPlanType("CHANGE");
+                        changePlanVO.setLogActionPlanTitle(cp.getTitle());
+                        changePlanVO.setLogActionPlanCurrentPattern(cp.getCurrentPattern());
+                        changePlanVO.setLogActionPlanCurrentContent(cp.getCurrentContent());
+                        changePlanVO.setLogActionPlanImprovedPattern(cp.getImprovedPattern());
+                        changePlanVO.setLogActionPlanImprovedContent(cp.getImprovedContent());
+                        changePlanVO.setLogResultId(savedResultId);
+                        logActionPlanMapper.insert(changePlanVO);
+                    }
                 }
             }
 

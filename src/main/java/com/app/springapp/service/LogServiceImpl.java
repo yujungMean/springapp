@@ -1,7 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.LogCreateRequestDTO;
-import com.app.springapp.domain.dto.request.LogUpdateRequestDTO;
+
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.LogListResponseDTO;
 import com.app.springapp.domain.dto.response.LogResponseDTO;
@@ -110,40 +110,5 @@ public class LogServiceImpl implements LogService {
         return ApiResponseDTO.of(true, "로그 상세 조회 성공", log);
     }
 
-    // 로그 수정 (본인 확인)
-    @Override
-    public ApiResponseDTO updateLog(LogUpdateRequestDTO dto, Long memberId) {
-        LogResponseDTO existing = logDAO.findById(dto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
-        if (!existing.getMemberId().equals(memberId)) {
-            return ApiResponseDTO.of(false, "수정 권한이 없습니다.");
-        }
-        LogVO logVO = new LogVO();
-        logVO.setId(dto.getId());
-        logVO.setLogTitle(dto.getLogTitle());
-        logVO.setVisionTitle(dto.getVisionTitle());
-        logVO.setLogContent(dto.getLogContent());
-        logVO.setLogThumbnailUrl(dto.getLogThumbnailUrl());
-        logVO.setCategoryId(dto.getCategoryId());
-        logVO.setLogStatus(dto.getLogStatus());
-        logVO.setLogProgress(dto.getLogProgress());
-        int updated = logDAO.update(logVO);
-        return updated > 0
-                ? ApiResponseDTO.of(true, "로그 수정 성공")
-                : ApiResponseDTO.of(false, "로그 수정 실패");
-    }
 
-    // 로그 삭제 (본인 확인 + 소프트 델리트)
-    @Override
-    public ApiResponseDTO deleteLog(Long id, Long memberId) {
-        LogResponseDTO existing = logDAO.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
-        if (!existing.getMemberId().equals(memberId)) {
-            return ApiResponseDTO.of(false, "삭제 권한이 없습니다.");
-        }
-        int deleted = logDAO.delete(id);
-        return deleted > 0
-                ? ApiResponseDTO.of(true, "로그 삭제 성공")
-                : ApiResponseDTO.of(false, "로그 삭제 실패");
-    }
 }

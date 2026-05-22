@@ -1,7 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.LogCreateRequestDTO;
-import com.app.springapp.domain.dto.request.LogUpdateRequestDTO;
+
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.LogListResponseDTO;
 
@@ -28,9 +28,5 @@ public interface LogService {
     // 로그 상세 조회
     ApiResponseDTO getLog(Long id);
 
-    // 로그 수정
-    ApiResponseDTO updateLog(LogUpdateRequestDTO dto, Long memberId);
 
-    // 로그 삭제
-    ApiResponseDTO deleteLog(Long id, Long memberId);
 }

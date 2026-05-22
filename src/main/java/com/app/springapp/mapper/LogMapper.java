@@ -44,11 +44,7 @@ public interface LogMapper {
     // 로그 상세 조회
     Optional<LogResponseDTO> selectById(Long id);
 
-    // 로그 수정
-    int update(LogVO logVO);
 
-    // 로그 삭제 (소프트)
-    int delete(Long id);
 
     // 조회수 +1
     void increaseReadCount(Long id);

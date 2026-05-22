@@ -34,8 +34,8 @@ public class LangchainResponseDTO {
 
     @Data
     public static class ActionPlansDTO {
-        private TryPlanDTO tryPlan;
-        private ChangePlanDTO changePlan;
+        private List<TryPlanDTO> tryPlans;
+        private List<ChangePlanDTO> changePlans;
     }
 
     @Data

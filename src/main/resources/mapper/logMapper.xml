@@ -127,29 +127,7 @@
           AND TBL.LOG_DELETED_AT IS NULL
     </select>
 
-    <!-- 로그 수정 -->
-    <update id="update" parameterType="LogVO">
-        UPDATE TBL_LOG
-        <set>
-            <if test="logTitle       != null">LOG_TITLE          = #{logTitle},</if>
-            <if test="visionTitle    != null">VISION_TITLE       = #{visionTitle},</if>
-            <if test="logContent     != null">LOG_CONTENT        = #{logContent},</if>
-            <if test="logThumbnailUrl!= null">LOG_THUMBNAIL_URL  = #{logThumbnailUrl},</if>
-            <if test="categoryId     != null">CATEGORY_ID        = #{categoryId},</if>
-            <if test="logStatus      != null">LOG_STATUS         = #{logStatus},</if>
-            <if test="logProgress    != null">LOG_PROGRESS       = #{logProgress},</if>
-        </set>
-        WHERE ID = #{id}
-          AND LOG_DELETED_AT IS NULL
-    </update>
 
-    <!-- 로그 삭제 (소프트 삭제) -->
-    <update id="delete" parameterType="long">
-        UPDATE TBL_LOG
-        SET LOG_DELETED_AT = CURRENT_TIMESTAMP
-        WHERE ID = #{id}
-          AND LOG_DELETED_AT IS NULL
-    </update>
 
     <!-- 로그 조회수 +1 -->
     <update id="increaseReadCount" parameterType="long">

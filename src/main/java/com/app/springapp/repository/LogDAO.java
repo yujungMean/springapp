@@ -1,6 +1,6 @@
 package com.app.springapp.repository;
 
-import com.app.springapp.domain.dto.request.LogUpdateRequestDTO;
+
 import com.app.springapp.domain.dto.response.LogListResponseDTO;
 import com.app.springapp.domain.dto.response.LogResponseDTO;
 import com.app.springapp.domain.vo.LogVO;
@@ -48,15 +48,7 @@ public class LogDAO {
         return logMapper.selectById(id);
     }
 
-    // 로그 수정
-    public int update(LogVO logVO) {
-        return logMapper.update(logVO);
-    }
 
-    // 로그 삭제 (소프트)
-    public int delete(Long id) {
-        return logMapper.delete(id);
-    }
 
     // 조회수 +1
     public void increaseReadCount(Long id) {
