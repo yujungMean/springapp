@@ -7,27 +7,29 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+// 로그 관련 DB 접근을 담당하는 DAO 클래스
 @Repository
 @RequiredArgsConstructor
 public class LogDAO {
+
     private final LogMapper logMapper;
 
-    // 로그 목록 조회 (최신순/좋아요순/조회순 정렬, 페이징)
+    // 전체 로그 목록 조회 (최신순/좋아요순/조회순 정렬, 페이징 적용)
     public List<LogListResponseDTO> findLogList(int offset, int size, String sort) {
         return logMapper.selectLogList(offset, size, sort);
     }
 
-    // 로그 키워드 검색 (제목 기준, 페이징)
+    // 키워드로 로그 목록 조회 (제목 기준 검색, 페이징 적용)
     public List<LogListResponseDTO> findLogListByKeyword(String keyword, int offset, int size, String sort) {
         return logMapper.selectLogListByKeyword(keyword, offset, size, sort);
     }
 
-    // 로그 카테고리 필터 조회 (페이징)
+    // 카테고리로 로그 목록 조회 (페이징 적용)
     public List<LogListResponseDTO> findLogListByCategory(String category, int offset, int size, String sort) {
         return logMapper.selectLogListByCategory(category, offset, size, sort);
     }
 
-    // 내 로그 목록 전체 조회 (프로젝트 생성 모달용 — 로그인한 사용자 기준)
+    // 회원 ID로 내 로그 목록 전체 조회 (프로젝트 생성 모달용)
     public List<LogListResponseDTO> findAllByMemberId(Long memberId) {
         return logMapper.findAllByMemberId(memberId);
     }
