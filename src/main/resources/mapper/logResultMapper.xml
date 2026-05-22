@@ -2,9 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 로그 분석 결과 관련 SQL Mapper (LogResultMapper 인터페이스와 매핑) -->
 <mapper namespace="com.app.springapp.mapper.LogResultMapper">
 
-    <!-- 로그 결과 조회 (logId 기준) -->
+    <!-- 로그 ID로 분석 결과 조회 -->
     <select id="findByLogId" parameterType="long" resultType="LogResultVO">
         SELECT
             ID                              AS id,
@@ -26,7 +27,7 @@
         WHERE LOG_ID = #{logId}
     </select>
 
-    <!-- 로그 결과 조회 (id 기준) -->
+    <!-- 분석 결과 ID로 조회 -->
     <select id="findById" parameterType="long" resultType="LogResultVO">
         SELECT
             ID                              AS id,
