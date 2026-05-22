@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.GuestbookReplyMapper">
+
+<!--    댓글 작성 (insertReply)-->
+    <insert id="insertReply" parameterType="GuestbookReplyCreateRequestDTO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_GUESTBOOK_REPLY.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_GUESTBOOK_REPLY (ID, GUESTBOOK_REPLY_CONTENT, GUESTBOOK_ID, WRITER_MEMBER_ID)
+        VALUES (#{id}, #{guestbookReplyContent}, #{guestbookId}, #{writerMemberId})
+    </insert>
+
+<!--    특정 방명록의 댓글 목록 조회 (selectRepliesByGuestbookId)-->
+
+    <select id="selectRepliesByGuestbookId" parameterType="Long" resultType="GuestbookReplyResponseDTO">
+        SELECT  TBRP.ID,
+                TBRP.GUESTBOOK_REPLY_CONTENT,
+                TBRP.GUESTBOOK_REPLY_CREATED_AT,
+                TBRP.GUESTBOOK_ID,
+                TBRP.WRITER_MEMBER_ID,
+                TBM.MEMBER_NICKNAME          AS WRITER_NICKNAME,
+                TBM.MEMBER_PROFILE_IMAGE_URL AS WRITER_PROFILE_IMAGE_URL,
+                (SELECT COUNT(*) FROM TBL_GUESTBOOK_REPLY_LIKE TBRPL
+        WHERE TBRPL.GUESTBOOK_REPLY_ID = TBRP.ID) AS LIKE_COUNT
+        FROM TBL_GUESTBOOK_REPLY TBRP
+        JOIN TBL_MEMBER TBM ON TBRP.WRITER_MEMBER_ID = TBM.ID
+        WHERE TBRP.GUESTBOOK_ID = #{guestbookId}
+        ORDER BY TBRP.GUESTBOOK_REPLY_CREATED_AT ASC
+    </select>
+
+<!--  댓글 수정  -->
+
+    <update id="updateGuestbookReplyContentByWriterMemberId" parameterType="GuestbookReplyVO">
+        UPDATE TBL_GUESTBOOK_REPLY
+        SET GUESTBOOK_REPLY_CONTENT = #{guestbookReplyContent}
+        WHERE ID = #{id}
+        AND WRITER_MEMBER_ID = #{writerMemberId}
+    </update>
+
+    <!--    댓글 삭제 (deleteReply)-->
+    <delete id="deleteReply" parameterType="GuestbookReplyVO">
+        DELETE FROM TBL_GUESTBOOK_REPLY
+        WHERE ID = #{id}
+        AND (WRITER_MEMBER_ID = #{writerMemberId})
+    </delete>
+</mapper>

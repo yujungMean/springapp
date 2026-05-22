@@ -9,4 +9,5 @@ public class GuestbookReplyVO {
    private String guestbookReplyContent;
    private String guestbookReplyCreatedAt;
    private Long guestbookId;
+   private Long writerMemberId;
 }

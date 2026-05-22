@@ -9,8 +9,14 @@ import org.springframework.stereotype.Component;
 @Schema(description = "방명록 댓글 작성 요청 DTO")
 public class GuestbookReplyCreateRequestDTO {
 
+    @Schema(description = "방명록 댓글 ID", example = "1", hidden = true)
+    private Long id;
+
     @Schema(description = "방명록 ID", example = "1", required = true)
     private Long guestbookId;
+
+    @Schema(description = "작성자 ID", example = "1", required = true)
+    private Long writerMemberId;
 
     @Schema(description = "댓글 내용 (최대 500자)", example = "감사합니다!", required = true)
     private String guestbookReplyContent;

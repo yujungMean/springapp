@@ -3,11 +3,12 @@ package com.app.springapp.service;
 import com.app.springapp.domain.dto.request.ProjectCreateRequestDTO;
 import com.app.springapp.domain.dto.response.ChecklistResponseDTO;
 import com.app.springapp.domain.dto.response.ProjectResponseDTO;
+import com.app.springapp.domain.vo.ChecklistVO;
 import com.app.springapp.domain.vo.LogResultVO;
 import com.app.springapp.domain.vo.ProjectVO;
 import com.app.springapp.repository.ChecklistDAO;
-import com.app.springapp.repository.ProjectDAO;
 import com.app.springapp.repository.LogResultDAO;
+import com.app.springapp.repository.ProjectDAO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// 프로젝트 서비스 구현체 - 프로젝트 생성(AI), 조회, 수정, 삭제 비즈니스 로직 처리
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,6 +45,16 @@ public class ProjectServiceImpl implements ProjectService {
     // ────────────────────────────────────────────────
     // 프로젝트 생성 (AI)
     // ────────────────────────────────────────────────
+
+    /**
+     * AI 기반 프로젝트 자동 생성
+     * - 로그 분석 결과를 기반으로 OpenAI API를 호출하여 프로젝트 정보 및 행동 추천 4개를 생성
+     * - 생성된 프로젝트를 DB에 저장 후 저장된 데이터를 다시 조회하여 반환
+     *
+     * @param requestDTO 프로젝트 생성 요청 정보 (로그 ID 포함)
+     * @param memberId   현재 로그인한 회원 ID
+     * @return 생성된 프로젝트 정보 (ProjectResponseDTO)
+     */
     @Override
     public ProjectResponseDTO createProjectByAI(ProjectCreateRequestDTO requestDTO, Long memberId) {
 
@@ -88,6 +100,15 @@ public class ProjectServiceImpl implements ProjectService {
     // ────────────────────────────────────────────────
     // OpenAI 호출
     // ────────────────────────────────────────────────
+
+    /**
+     * OpenAI API를 호출하여 프로젝트 정보 생성
+     * - 로그 분석 결과를 프롬프트로 변환 후 OpenAI에 전송
+     * - 응답받은 JSON을 AiProjectResult 객체로 파싱하여 반환
+     *
+     * @param logResult 로그 분석 결과 (LogResultVO)
+     * @return AI가 생성한 프로젝트 정보 (AiProjectResult)
+     */
     private AiProjectResult generateProjectByAI(LogResultVO logResult) {
 
         log.info("===== OpenAI API 호출 시작 - logId: {} =====", logResult.getLogId());
@@ -125,6 +146,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    // 로그 분석 결과를 OpenAI 프롬프트로 변환
     private String buildPrompt(LogResultVO logResult, String today) {
         return String.format("""
         아래는 사용자의 실패 분석 결과입니다.
@@ -174,6 +196,7 @@ public class ProjectServiceImpl implements ProjectService {
         );
     }
 
+    // OpenAI 응답 JSON을 AiProjectResult 객체로 파싱
     private AiProjectResult parseAiResponse(String responseBody) throws Exception {
         JsonNode root = objectMapper.readTree(responseBody);
         String content = root.path("choices").get(0).path("message").path("content").asText();
@@ -215,6 +238,14 @@ public class ProjectServiceImpl implements ProjectService {
     // ────────────────────────────────────────────────
     // 목록 조회
     // ────────────────────────────────────────────────
+
+    /**
+     * 회원 ID로 내 프로젝트 목록 조회
+     * - 각 프로젝트에 체크리스트 최대 2개를 포함하여 반환
+     *
+     * @param memberId 현재 로그인한 회원 ID
+     * @return 프로젝트 목록 (List<ProjectResponseDTO>)
+     */
     @Override
     public List<ProjectResponseDTO> getMyProjects(Long memberId) {
         return projectDAO.findAllByMemberId(memberId)
@@ -222,7 +253,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(vo -> {
                     ProjectResponseDTO dto = toResponseDTO(vo);
                     // 체크리스트 최대 2개 포함
-                    List<ChecklistResponseDTO> checklists = checklistDAO.findAllByProjectId(vo.getId())
+                    List<ChecklistResponseDTO> checklistDtos = checklistDAO.findAllByProjectId(vo.getId())
                             .stream()
                             .limit(2)
                             .map(c -> {
@@ -235,7 +266,7 @@ public class ProjectServiceImpl implements ProjectService {
                                 return cdto;
                             })
                             .collect(Collectors.toList());
-                    dto.setChecklists(checklists);
+                    dto.setChecklists(checklistDtos);
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -244,6 +275,15 @@ public class ProjectServiceImpl implements ProjectService {
     // ────────────────────────────────────────────────
     // 단건 조회
     // ────────────────────────────────────────────────
+
+    /**
+     * 프로젝트 ID로 단건 조회
+     * - 본인 소유 프로젝트가 아닐 경우 예외 발생
+     *
+     * @param projectId 조회할 프로젝트 ID
+     * @param memberId  현재 로그인한 회원 ID
+     * @return 프로젝트 상세 정보 (ProjectResponseDTO)
+     */
     @Override
     public ProjectResponseDTO getProject(Long projectId, Long memberId) {
         ProjectVO projectVO = projectDAO.findById(projectId);
@@ -256,18 +296,30 @@ public class ProjectServiceImpl implements ProjectService {
     // ────────────────────────────────────────────────
     // 삭제
     // ────────────────────────────────────────────────
+
+    /**
+     * 프로젝트 삭제
+     * - 본인 소유 프로젝트가 아닐 경우 예외 발생
+     *
+     * @param projectId 삭제할 프로젝트 ID
+     * @param memberId  현재 로그인한 회원 ID
+     */
     @Override
     public void deleteProject(Long projectId, Long memberId) {
-        ProjectVO projectVO = projectDAO.findById(projectId);
-        if (projectVO == null || !projectVO.getMemberId().equals(memberId)) {
+        ProjectVO existing = projectDAO.findById(projectId);
+        if (existing == null || !existing.getMemberId().equals(memberId)) {
             throw new RuntimeException("프로젝트를 찾을 수 없습니다.");
         }
+        // 체크리스트 먼저 삭제 후 프로젝트 삭제
+        checklistDAO.deleteAllByProjectId(projectId);
         projectDAO.deleteById(projectId);
     }
 
     // ────────────────────────────────────────────────
     // 내부 클래스 — AI 응답 파싱용
     // ────────────────────────────────────────────────
+
+    // OpenAI 응답을 담는 내부 클래스
     @lombok.Data
     private static class AiProjectResult {
         private String projectTitle;
@@ -278,10 +330,13 @@ public class ProjectServiceImpl implements ProjectService {
         private List<ProjectResponseDTO.AiSuggestionItem> aiSuggestions;
     }
 
+    // ProjectVO → ProjectResponseDTO 변환 헬퍼 메서드
     private ProjectResponseDTO toResponseDTO(ProjectVO vo) {
         ProjectResponseDTO dto = new ProjectResponseDTO();
         dto.setId(vo.getId());
         dto.setMemberId(vo.getMemberId());
+        dto.setMemberNickname(vo.getMemberNickname());
+        dto.setMemberProfileImageUrl(vo.getMemberProfileImageUrl());
         dto.setLogId(vo.getLogId());
         dto.setProjectTitle(vo.getProjectTitle());
         dto.setProjectContent(vo.getProjectContent());
@@ -291,7 +346,6 @@ public class ProjectServiceImpl implements ProjectService {
         dto.setProjectCreatedAt(vo.getProjectCreatedAt());
         dto.setVisionTitle(vo.getVisionTitle());
 
-        // AI 행동 추천 리스트로 변환
         List<ProjectResponseDTO.AiSuggestionItem> aiSuggestions = new ArrayList<>();
         if (vo.getAiSuggestion1Title() != null) {
             aiSuggestions.add(createAiSuggestion(vo.getAiSuggestion1Title(), vo.getAiSuggestion1Desc()));
@@ -310,5 +364,188 @@ public class ProjectServiceImpl implements ProjectService {
         item.setTitle(title);
         item.setDesc(desc);
         return item;
+    }
+
+    /**
+     * 프로젝트 수정
+     * - 본인 소유 프로젝트가 아닐 경우 예외 발생
+     * - 프로젝트 ID를 설정한 후 DB 업데이트
+     *
+     * @param projectId  수정할 프로젝트 ID
+     * @param memberId   현재 로그인한 회원 ID
+     * @param projectVO  수정할 프로젝트 정보 (ProjectVO)
+     */
+    @Override
+    public void updateProject(Long projectId, Long memberId, ProjectVO projectVO) {
+        ProjectVO existing = projectDAO.findById(projectId);
+        if (existing == null || !existing.getMemberId().equals(memberId)) {
+            throw new RuntimeException("프로젝트를 찾을 수 없습니다.");
+        }
+        projectVO.setId(projectId);
+        projectDAO.updateProject(projectVO);
+    }
+
+    // ────────────────────────────────────────────────
+    // 다른 사람들의 프로젝트 목록 조회
+    // ────────────────────────────────────────────────
+
+    @Override
+    public List<ProjectResponseDTO> getOtherProjects(Long memberId) {
+        return projectDAO.findAllOtherProjects(memberId)
+                .stream()
+                .map(vo -> {
+                    ProjectResponseDTO dto = toResponseDTO(vo);
+                    // 체크리스트 최대 2개 포함
+                    List<ChecklistResponseDTO> checklistDtos = checklistDAO.findAllByProjectId(vo.getId())
+                            .stream()
+                            .limit(2)
+                            .map(c -> {
+                                ChecklistResponseDTO cdto = new ChecklistResponseDTO();
+                                cdto.setId(c.getId());
+                                cdto.setChecklistTitle(c.getChecklistTitle());
+                                cdto.setChecklistPriority(c.getChecklistPriority());
+                                cdto.setChecklistCompleted(c.getChecklistCompleted());
+                                cdto.setChecklistFailed(c.getChecklistFailed());
+                                return cdto;
+                            })
+                            .collect(Collectors.toList());
+                    dto.setChecklists(checklistDtos);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // ────────────────────────────────────────────────
+    // 다른 사람 프로젝트 단건 조회 (소유자 검증 없음)
+    // ────────────────────────────────────────────────
+
+    /**
+     * 프로젝트 ID로 단건 조회 (소유자 검증 없음)
+     * - 다른 사람의 프로젝트를 조회할 때 사용
+     * - 체크리스트 목록도 함께 반환
+     *
+     * @param projectId 조회할 프로젝트 ID
+     * @return 프로젝트 상세 정보 (ProjectResponseDTO)
+     */
+    @Override
+    public ProjectResponseDTO getProjectPublic(Long projectId) {
+        // 프로젝트 조회
+        ProjectVO projectVO = projectDAO.findByIdPublic(projectId);
+        if (projectVO == null) {
+            throw new RuntimeException("프로젝트를 찾을 수 없습니다.");
+        }
+
+        // VO → DTO 변환
+        ProjectResponseDTO dto = toResponseDTO(projectVO);
+
+        // 체크리스트 목록 조회 후 DTO에 세팅
+        List<ChecklistResponseDTO> checklistDtos = checklistDAO.findAllByProjectId(projectId)
+                .stream()
+                .map(c -> {
+                    ChecklistResponseDTO cdto = new ChecklistResponseDTO();
+                    cdto.setId(c.getId());
+                    cdto.setChecklistTitle(c.getChecklistTitle());
+                    cdto.setChecklistPriority(c.getChecklistPriority());
+                    cdto.setChecklistCompleted(c.getChecklistCompleted());
+                    cdto.setChecklistFailed(c.getChecklistFailed());
+                    return cdto;
+                })
+                .collect(Collectors.toList());
+        dto.setChecklists(checklistDtos);
+
+        return dto;
+    }
+
+    // ────────────────────────────────────────────────
+    // 다른 사람의 프로젝트 복사
+    // ────────────────────────────────────────────────
+
+    /**
+     * 다른 사람의 프로젝트를 내 프로젝트로 복사
+     * - 프로젝트 정보(제목, 내용, AI추천)와 체크리스트를 그대로 복사
+     * - 복사된 프로젝트의 소유자는 현재 로그인한 회원으로 설정
+     *
+     * @param projectId 복사할 프로젝트 ID
+     * @param memberId  현재 로그인한 회원 ID
+     */
+    @Override
+    public void copyProject(Long projectId, Long memberId) {
+        // 원본 프로젝트 조회
+        ProjectVO original = projectDAO.findByIdPublic(projectId);
+        if (original == null) {
+            throw new RuntimeException("복사할 프로젝트를 찾을 수 없습니다.");
+        }
+
+        // 내 프로젝트로 복사 (소유자를 현재 회원으로 변경)
+        ProjectVO copy = new ProjectVO();
+        copy.setProjectTitle(original.getProjectTitle());
+        copy.setProjectContent(original.getProjectContent());
+        copy.setProjectStartDate(original.getProjectStartDate());
+        copy.setProjectEndDate(original.getProjectEndDate());
+        copy.setProgressDay(original.getProgressDay());
+        copy.setMemberId(memberId);
+        copy.setLogId(original.getLogId());
+        copy.setAiSuggestion1Title(original.getAiSuggestion1Title());
+        copy.setAiSuggestion1Desc(original.getAiSuggestion1Desc());
+        copy.setAiSuggestion2Title(original.getAiSuggestion2Title());
+        copy.setAiSuggestion2Desc(original.getAiSuggestion2Desc());
+        copy.setAiSuggestion3Title(original.getAiSuggestion3Title());
+        copy.setAiSuggestion3Desc(original.getAiSuggestion3Desc());
+        copy.setAiSuggestion4Title(original.getAiSuggestion4Title());
+        copy.setAiSuggestion4Desc(original.getAiSuggestion4Desc());
+
+        // 프로젝트 복사 후 생성된 ID 획득
+        projectDAO.copyProject(copy);
+
+        // 원본 체크리스트 조회 후 복사
+        List<ChecklistVO> checklists = checklistDAO.findAllByProjectId(projectId);
+        for (ChecklistVO checklist : checklists) {
+            ChecklistVO copyChecklist = new ChecklistVO();
+            copyChecklist.setChecklistTitle(checklist.getChecklistTitle());
+            copyChecklist.setChecklistMemo(checklist.getChecklistMemo());
+            copyChecklist.setChecklistPriority(checklist.getChecklistPriority());
+            copyChecklist.setProjectId(copy.getId());
+            copyChecklist.setMemberId(memberId);
+            projectDAO.copyChecklist(copyChecklist);
+        }
+    }
+
+    // ────────────────────────────────────────────────
+    // 프로젝트 제목으로 검색
+    // ────────────────────────────────────────────────
+
+    /**
+     * 프로젝트 제목으로 검색 (내 프로젝트 제외)
+     * - 검색어가 포함된 프로젝트 목록 반환
+     * - 각 프로젝트에 체크리스트 최대 2개 포함
+     *
+     * @param memberId 현재 로그인한 회원 ID
+     * @param keyword  검색어
+     * @return 검색된 프로젝트 목록 (List<ProjectResponseDTO>)
+     */
+    @Override
+    public List<ProjectResponseDTO> searchOtherProjects(Long memberId, String keyword) {
+        return projectDAO.searchOtherProjects(memberId, keyword)
+                .stream()
+                .map(vo -> {
+                    ProjectResponseDTO dto = toResponseDTO(vo);
+                    // 체크리스트 최대 2개 포함
+                    List<ChecklistResponseDTO> checklistDtos = checklistDAO.findAllByProjectId(vo.getId())
+                            .stream()
+                            .limit(2)
+                            .map(c -> {
+                                ChecklistResponseDTO cdto = new ChecklistResponseDTO();
+                                cdto.setId(c.getId());
+                                cdto.setChecklistTitle(c.getChecklistTitle());
+                                cdto.setChecklistPriority(c.getChecklistPriority());
+                                cdto.setChecklistCompleted(c.getChecklistCompleted());
+                                cdto.setChecklistFailed(c.getChecklistFailed());
+                                return cdto;
+                            })
+                            .collect(Collectors.toList());
+                    dto.setChecklists(checklistDtos);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
