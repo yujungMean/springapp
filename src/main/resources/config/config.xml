@@ -19,6 +19,7 @@
         <typeAlias type="com.app.springapp.domain.dto.request.EmailVerificationConfirmRequestDTO" alias="EmailVerificationConfirmRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.EmailVerificationSendRequestDTO" alias="EmailVerificationSendRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.GuestbookCreateRequestDTO" alias="GuestbookCreateRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.GuestbookRereplyCreateRequestDTO" alias="GuestbookRereplyCreateRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.GuestbookReplyCreateRequestDTO" alias="GuestbookReplyCreateRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.LogActionPlanCreateRequestDTO" alias="LogActionPlanCreateRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.LogCreateRequestDTO" alias="LogCreateRequestDTO"/>
@@ -59,6 +60,7 @@
         <typeAlias type="com.app.springapp.domain.dto.response.CommunityResponseDTO" alias="CommunityResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.GuestbookReplyResponseDTO" alias="GuestbookReplyResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.GuestbookResponseDTO" alias="GuestbookResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.GuestbookRereplyResponseDTO" alias="GuestbookRereplyResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.LogActionPlanResponseDTO" alias="LogActionPlanResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.LogListResponseDTO" alias="LogListResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.LogPatternResponseDTO" alias="LogPatternResponseDTO"/>
@@ -92,6 +94,7 @@
         <typeAlias type="com.app.springapp.domain.vo.GuestbookLikeVO" alias="GuestbookLikeVO"/>
         <typeAlias type="com.app.springapp.domain.vo.GuestbookReplyLikeVO" alias="GuestbookReplyLikeVO"/>
         <typeAlias type="com.app.springapp.domain.vo.GuestbookReplyVO" alias="GuestbookReplyVO"/>
+        <typeAlias type="com.app.springapp.domain.vo.GuestbookRereplyVO" alias="GuestbookRereplyVO"/>
         <typeAlias type="com.app.springapp.domain.vo.GuestbookVO" alias="GuestbookVO"/>
         <typeAlias type="com.app.springapp.domain.vo.LogActionPlanVO" alias="LogActionPlanVO"/>
         <typeAlias type="com.app.springapp.domain.vo.LogLikeVO" alias="LogLikeVO"/>

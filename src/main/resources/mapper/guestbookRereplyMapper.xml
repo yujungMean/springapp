@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.GuestbookRereplyMapper">
+
+    <insert id="insertRereply" parameterType="GuestbookRereplyCreateRequestDTO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_GUESTBOOK_REREPLY.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_GUESTBOOK_REREPLY (ID, GUESTBOOK_REREPLY_CONTENT, GUESTBOOK_REPLY_ID, WRITER_MEMBER_ID)
+        VALUES (#{id}, #{guestbookRereplyContent}, #{guestbookReplyId}, #{writerMemberId})
+    </insert>
+
+    <select id="selectRerepliesByGuestbookReplyId" parameterType="Long" resultType="GuestbookRereplyResponseDTO">
+        SELECT  TBRP.ID,
+        TBRP.GUESTBOOK_REREPLY_CONTENT,
+        TBRP.GUESTBOOK_REREPLY_CREATED_AT,
+        TBRP.GUESTBOOK_REPLY_ID,
+        TBRP.WRITER_MEMBER_ID,
+        TBM.MEMBER_NICKNAME          AS WRITER_NICKNAME,
+        TBM.MEMBER_PROFILE_IMAGE_URL AS WRITER_PROFILE_IMAGE_URL,
+        (SELECT COUNT(*) FROM TBL_GUESTBOOK_REREPLY_LIKE TBRPL
+        WHERE TBRPL.GUESTBOOK_REREPLY_ID = TBRP.ID) AS LIKE_COUNT
+        FROM TBL_GUESTBOOK_REREPLY TBRP
+        JOIN TBL_MEMBER TBM ON TBRP.WRITER_MEMBER_ID = TBM.ID
+        WHERE TBRP.GUESTBOOK_REPLY_ID = #{guestbookReplyId}
+        ORDER BY TBRP.GUESTBOOK_REREPLY_CREATED_AT ASC
+    </select>
+
+    <update id="updateGuestbookRereplyContentByWriterMemberId" parameterType="GuestbookRereplyVO">
+        UPDATE TBL_GUESTBOOK_REREPLY
+        SET GUESTBOOK_REREPLY_CONTENT = #{guestbookRereplyContent}
+        WHERE ID = #{id}
+        AND WRITER_MEMBER_ID = #{writerMemberId}
+    </update>
+
+    <delete id="deleteRereply" parameterType="GuestbookRereplyVO">
+        DELETE FROM TBL_GUESTBOOK_REREPLY
+        WHERE ID = #{id}
+        AND WRITER_MEMBER_ID = #{writerMemberId}
+    </delete>
+
+</mapper>
