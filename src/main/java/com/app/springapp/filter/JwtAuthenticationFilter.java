@@ -38,9 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         if (path.startsWith("/private")) return false;
+        if (path.startsWith("/api/project")) return false;
         if (path.equals("/api/logs/my-list")) return false;
-        if (path.equals("/api/logs/analyze") && method.equals("POST")) return false;  // 추가
-        if (path.startsWith("/api/logs") && method.equals("POST")) return false;       // 추가
+        if (path.equals("/api/logs/analyze") && method.equals("POST")) return false;
+        if (path.startsWith("/api/logs") && method.equals("POST")) return false;
         return true;
     }
 
@@ -65,9 +66,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = getAccessTokenFromCookie(request);
         String memberEmail = null;
         String socialMemberProvider = null;
+        boolean isPrivatePath = request.getRequestURI().startsWith("/private");
 
-        if(accessToken == null){
-            sendErrorResponse(response, "토큰 없음 또는 인증 실패");
+        if (accessToken == null) {
+            if (isPrivatePath) {
+                sendErrorResponse(response, "토큰 없음 또는 인증 실패");
+                return;
+            }
+            filterChain.doFilter(request, response);
             return;
         }
 

@@ -82,6 +82,7 @@ public class AuthServiceImpl implements AuthService {
 
         jwtTokenDTO.setAccessToken(accessToken);
         jwtTokenDTO.setRefreshToken(refreshToken);
+        jwtTokenDTO.setMemberId(foundMember.getId());
 
         // redis에 refresh 토큰 저장
         saveRefreshToken(jwtTokenDTO);
@@ -311,12 +312,25 @@ public class AuthServiceImpl implements AuthService {
                 .findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
 
+        if (passwordEncoder.matches(newPassword, foundMember.getMemberPassword())) {
+            throw new MemberException("이전 비밀번호와 같습니다.", HttpStatus.BAD_REQUEST);
+        }
+
         MemberVO memberVO = new MemberVO();
         memberVO.setId(foundMember.getId());
         memberVO.setMemberPassword(passwordEncoder.encode(newPassword));
 
         memberDAO.update(memberVO);
         return true;
+    }
+
+    // 이메일 등록 여부 확인 (비밀번호 재설정용)
+    @Override
+    public boolean existsMemberByEmail(String email) {
+        MemberDTO memberDTO = new MemberDTO();
+        memberDTO.setMemberEmail(email);
+        memberDTO.setSocialMemberProvider("local");
+        return memberDAO.existsMemberByMemberEmailAndSocialMemberProvider(memberDTO);
     }
 
     // 이메일 인증 코드 검증
