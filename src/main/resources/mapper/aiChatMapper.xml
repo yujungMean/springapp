@@ -16,11 +16,11 @@
         SELECT ID          as id,
                AI_CHAT_CONTENT   as aiChatContent,
                AI_CHAT_ROLE      as aiChatRole,
-               AI_CHAT_CREATE_AT as aiChatCreateAt,
+               AI_CHAT_CREATED_AT as aiChatCreateAt,
                MEMBER_ID         as memberId
         FROM TBL_AI_CHAT
         WHERE MEMBER_ID = #{memberId}
-        ORDER BY AI_CHAT_CREATE_AT ASC
+        ORDER BY AI_CHAT_CREATED_AT ASC
     </select>
 
 </mapper>

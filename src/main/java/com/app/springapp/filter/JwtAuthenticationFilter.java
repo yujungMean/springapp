@@ -32,12 +32,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final MemberDAO memberDAO;
     private final ObjectMapper objectMapper;
 
-    // /private으로 시작하거나 인증이 필요한 특정 경로는 검사
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        if (path.startsWith("/private"))       return false;
-        if (path.equals("/api/logs/my-list"))  return false;
+        String method = request.getMethod();
+
+        if (path.startsWith("/private")) return false;
+        if (path.equals("/api/logs/my-list")) return false;
+        if (path.equals("/api/logs/analyze") && method.equals("POST")) return false;  // 추가
+        if (path.startsWith("/api/logs") && method.equals("POST")) return false;       // 추가
         return true;
     }
 
@@ -64,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String socialMemberProvider = null;
 
         if(accessToken == null){
-            sendErrorResponse(response, "토큰 없음");
+            sendErrorResponse(response, "토큰 없음 또는 인증 실패");
             return;
         }
 
@@ -86,7 +89,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            // 토큰 형식이 잘못 되었을 때
             SecurityContextHolder.clearContext();
             sendErrorResponse(response, "토큰 만료");
             return;
@@ -105,11 +107,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write(json);
         response.getWriter().flush();
     }
-
-
-
-
 }
-
-
-
