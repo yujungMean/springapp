@@ -2,9 +2,11 @@ package com.app.springapp.api;
 
 import com.app.springapp.domain.dto.request.PostLikeRequestDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyLikeRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.PostLikeService;
 import com.app.springapp.service.PostService;
+import com.app.springapp.service.ReplyLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +28,7 @@ public class PostAPI {
 
     private final PostService postService;
     private final PostLikeService postLikeService;
+    private final ReplyLikeService replyLikeService;
 
     //게시글 열람
     @PostMapping("/read")
@@ -72,6 +75,36 @@ public class PostAPI {
                         true,
                         "게시글 좋아요 취소 성공",
                         postLikeService.cancelPostLike(postLikeRequestDTO)));
+    }
+
+    //댓글 좋아요
+    @PostMapping("/like-reply")
+    @Operation(summary = "댓글 좋아요 서비스", description = "댓글 좋아요 서비스")
+    @ApiResponse(responseCode = "201", description = "댓글 좋아요 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> applyReplyLike(@RequestBody ReplyLikeRequestDTO replyLikeRequestDTO) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "댓글 좋아요 성공",
+                        replyLikeService.likeReply(replyLikeRequestDTO)));
+    }
+
+    //댓글 좋아요 취소
+    @PostMapping("/cancel-like-reply")
+    @Operation(summary = "댓글 좋아요 취소 서비스", description = "댓글 좋아요 취소 서비스")
+    @ApiResponse(responseCode = "201", description = "댓글 좋아요 취소 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> cancelReplyLike(@RequestBody ReplyLikeRequestDTO replyLikeRequestDTO) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "댓글 좋아요 취소 성공",
+                        replyLikeService.cancelReplyLike(replyLikeRequestDTO)));
     }
 
 }

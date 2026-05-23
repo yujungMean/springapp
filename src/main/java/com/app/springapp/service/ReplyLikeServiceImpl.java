@@ -1,8 +1,6 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.PostLikeRequestDTO;
 import com.app.springapp.domain.dto.request.ReplyLikeRequestDTO;
-import com.app.springapp.domain.dto.response.PostLikeResponseDTO;
 import com.app.springapp.domain.dto.response.ReplyLikeResponseDTO;
 import com.app.springapp.exception.ReplyLikeException;
 import com.app.springapp.repository.ReplyLikeDAO;
@@ -22,8 +20,16 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
 
     // 게시글 좋아요
     @Override
-    public void likeReply(ReplyLikeRequestDTO replyLikeRequestDTO) {
+    public ReplyLikeResponseDTO likeReply(ReplyLikeRequestDTO replyLikeRequestDTO) {
         replyLikeDAO.save(replyLikeRequestDTO);
+        return findReplyLikeCountAndIsLiked(replyLikeRequestDTO);
+    }
+
+    // 댓글 좋아요 취소
+    @Override
+    public ReplyLikeResponseDTO cancelReplyLike(ReplyLikeRequestDTO replyLikeRequestDTO) {
+        replyLikeDAO.delete(replyLikeRequestDTO);
+        return findReplyLikeCountAndIsLiked(replyLikeRequestDTO);
     }
 
     // 게시글 좋아요 조회
