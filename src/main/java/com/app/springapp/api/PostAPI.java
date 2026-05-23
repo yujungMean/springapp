@@ -1,23 +1,19 @@
 package com.app.springapp.api;
 
-import com.app.springapp.domain.dto.request.PostLikeRequestDTO;
-import com.app.springapp.domain.dto.request.PostReadRequestDTO;
-import com.app.springapp.domain.dto.request.ReplyLikeRequestDTO;
+import com.app.springapp.domain.dto.request.*;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
-import com.app.springapp.service.PostLikeService;
-import com.app.springapp.service.PostService;
-import com.app.springapp.service.ReplyLikeService;
+import com.app.springapp.service.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +25,8 @@ public class PostAPI {
     private final PostService postService;
     private final PostLikeService postLikeService;
     private final ReplyLikeService replyLikeService;
+    private final ReplyService replyService;
+    private final RereplyService rereplyService;
 
     //게시글 열람
     @PostMapping("/read")
@@ -107,4 +105,59 @@ public class PostAPI {
                         replyLikeService.cancelReplyLike(replyLikeRequestDTO)));
     }
 
+    //댓글 작성
+    @PostMapping("/write-reply")
+    @Operation(summary = "댓글 작성 서비스", description = "댓글을 작성하는 서비스")
+    @ApiResponse(responseCode = "201", description = "댓글 작성 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> writeReply(@RequestBody ReplyCreateRequestDTO replyCreateRequestDTO) {
+
+        replyService.writeReply(replyCreateRequestDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "댓글 작성 성공"));
+    }
+
+    //댓글 삭제(작업중)
+    @DeleteMapping("/delete-reply/{id}")
+    @Operation(summary = "댓글 삭제 서비스", description = "댓글id로 댓글을 삭제하는 서비스")
+    @ApiResponse(responseCode = "200", description = "댓글 삭제 완료")
+    @ApiResponse(responseCode = "404", description = "댓글 없음")
+    @Parameter(
+            name = "id",
+            description = "댓글 번호",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1",
+            schema = @Schema(type = "number")
+    )
+    public ResponseEntity<ApiResponseDTO> deleteReply(@PathVariable Long id) {
+
+        replyService.deleteReply(id);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "댓글 삭제 성공"));
+    }
+
+    //대댓글 작성
+    @PostMapping("/write-rereply")
+    @Operation(summary = "대댓글 작성 서비스", description = "대댓글을 작성하는 서비스")
+    @ApiResponse(responseCode = "201", description = "대댓글 작성 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> writeRereply(@RequestBody RereplyCreateRequestDTO rereplyCreateRequestDTO) {
+
+        rereplyService.writeRereply(rereplyCreateRequestDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "대댓글 작성 성공"));
+    }
 }

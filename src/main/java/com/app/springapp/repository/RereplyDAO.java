@@ -1,5 +1,6 @@
 package com.app.springapp.repository;
 
+import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
 import com.app.springapp.mapper.RereplyMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,10 @@ public class RereplyDAO {
     //댓글id로 대댓글 목록 보여준다
     public List<RereplyResponseDTO> findAll(Long id) {
         return rereplyMapper.selectAll(id);
+    }
+
+    //대댓글 작성
+    public void save(RereplyCreateRequestDTO rereplyCreateRequestDTO) {
+        rereplyMapper.insert(rereplyCreateRequestDTO);
     }
 }

@@ -1,7 +1,7 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.ReplyDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyCreateRequestDTO;
 import com.app.springapp.domain.dto.response.PostReadReplyResponseDTO;
 
 import java.util.List;
@@ -13,4 +13,10 @@ public interface ReplyService {
 
     //작성자가 작성한 댓글 수
     public Integer countReply(Long memberId);
+
+    //댓글 작성
+    public void writeReply(ReplyCreateRequestDTO replyCreateRequestDTO);
+
+    //댓글 삭제
+    public void deleteReply(Long replyId);
 }

@@ -1,6 +1,8 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
+import com.app.springapp.repository.ReplyDAO;
 import com.app.springapp.repository.RereplyDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +18,16 @@ import java.util.List;
 public class RereplyServiceImpl implements RereplyService {
 
     private final RereplyDAO rereplyDAO;
+    private final ReplyDAO replyDAO;
 
     //댓글id로 대댓글 목록 보여준다
     @Override
     public List<RereplyResponseDTO> findAll(Long replyId) {
         return rereplyDAO.findAll(replyId);
+    }
+
+    @Override
+    public void writeRereply(RereplyCreateRequestDTO rereplyCreateRequestDTO) {
+        rereplyDAO.save(rereplyCreateRequestDTO);
     }
 }

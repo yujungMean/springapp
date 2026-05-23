@@ -12,6 +12,9 @@ public class RereplyCreateRequestDTO {
     @Schema(description = "댓글 ID", example = "1", required = true)
     private Long replyId;
 
+    @Schema(description = "대댓글 작성자 ID", example = "1", required = true)
+    private Long memberId;
+
     @Schema(description = "대댓글 내용", example = "저도 동의해요!", required = false)
     private String rereplyContent;
 }

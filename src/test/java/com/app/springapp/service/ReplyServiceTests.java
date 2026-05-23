@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyCreateRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +25,19 @@ public class ReplyServiceTests {
     @Test
     public void countPostTest() {
         log.info("{}", replyService.countReply(10L));
+    }
+
+    @Test
+    public void writeReplyTest() {
+        ReplyCreateRequestDTO replyCreateRequestDTO = new ReplyCreateRequestDTO();
+        replyCreateRequestDTO.setPostId(20L);
+        replyCreateRequestDTO.setMemberId(2L);
+        replyCreateRequestDTO.setReplyContent("input text");
+        replyService.writeReply(replyCreateRequestDTO);
+    }
+
+    @Test
+    public void deleteReplyTest() {
+        replyService.deleteReply(57L);
     }
 }

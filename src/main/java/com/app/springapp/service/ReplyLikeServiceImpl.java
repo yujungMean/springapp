@@ -32,6 +32,11 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
         return findReplyLikeCountAndIsLiked(replyLikeRequestDTO);
     }
 
+    @Override
+    public void deleteById(Long replyId) {
+        replyLikeDAO.deleteById(replyId);
+    }
+
     // 게시글 좋아요 조회
     @Override
     public ReplyLikeResponseDTO findReplyLikeCountAndIsLiked(ReplyLikeRequestDTO replyLikeRequestDTO) {

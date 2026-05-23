@@ -1,5 +1,6 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,5 +16,14 @@ public class RereplyServiceTests {
     @Test
     public void findAllTest() {
         log.info("findAll : {}", rereplyService.findAll(49L));
+    }
+
+    @Test
+    public void writeRereplyTest() {
+        RereplyCreateRequestDTO rereplyCreateRequestDTO = new RereplyCreateRequestDTO();
+        rereplyCreateRequestDTO.setReplyId(51L);
+        rereplyCreateRequestDTO.setMemberId(4L);
+        rereplyCreateRequestDTO.setRereplyContent("콘텐트 input");
+        rereplyService.writeRereply(rereplyCreateRequestDTO);
     }
 }

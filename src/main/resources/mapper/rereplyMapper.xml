@@ -13,4 +13,10 @@
         WHERE TBR.REPLY_ID = #{id}
 
     </select>
+
+    <!-- 대댓글 작성 -->
+    <insert id="insert" parameterType="RereplyCreateRequestDTO">
+        INSERT INTO TBL_REREPLY
+        VALUES (SEQ_REREPLY.NEXTVAL, #{rereplyContent}, CURRENT_TIMESTAMP, #{replyId}, #{memberId})
+    </insert>
 </mapper>
