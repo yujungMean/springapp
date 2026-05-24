@@ -1,14 +1,13 @@
 package com.app.springapp.repository;
 
+import com.app.springapp.domain.dto.PostCreateDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
 import com.app.springapp.domain.dto.response.PostAfterResponseDTO;
 import com.app.springapp.domain.dto.response.PostBeforeResponseDTO;
 import com.app.springapp.domain.dto.response.PostResponseDTO;
-import com.app.springapp.domain.vo.PostVO;
 import com.app.springapp.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import retrofit2.http.POST;
 
 import java.util.Optional;
 
@@ -37,5 +36,10 @@ public class PostDAO {
     //작성자가 작성한 게시글 수
     public Integer countPost(Long memberId) {
         return postMapper.selectPostCountByMemberId(memberId);
+    }
+
+    //게시글 작성
+    public void save(PostCreateDTO postCreateDTO) {
+        postMapper.insert(postCreateDTO);
     }
 }

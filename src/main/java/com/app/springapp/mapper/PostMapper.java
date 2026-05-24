@@ -1,14 +1,11 @@
 package com.app.springapp.mapper;
 
+import com.app.springapp.domain.dto.PostCreateDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
 import com.app.springapp.domain.dto.response.PostAfterResponseDTO;
 import com.app.springapp.domain.dto.response.PostBeforeResponseDTO;
 import com.app.springapp.domain.dto.response.PostResponseDTO;
-import com.app.springapp.domain.vo.PostVO;
 import org.apache.ibatis.annotations.Mapper;
-import retrofit2.http.POST;
-
-import java.util.Optional;
 
 @Mapper
 public interface PostMapper {
@@ -24,4 +21,7 @@ public interface PostMapper {
 
     //작성자가 작성한 게시글 수
     public Integer selectPostCountByMemberId(Long memberId);
+
+    //게시글 작성
+    public void insert(PostCreateDTO postCreateDTO);
 }

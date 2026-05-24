@@ -1,6 +1,5 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.PostLikeRequestDTO;
 import com.app.springapp.domain.dto.request.ReplyLikeRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ public class ReplyLikeTests {
     public void ReplyLikeTest() {
         for(int i = 1; i <= 10; i++) {
             for(int j = 1; j <= 55; j++) {
-                if(Math.random() < 0.5) {
+                if(Math.random() < 0.6) {
                     Long l1 = (long)i;
                     Long l2 = (long)j;
                     ReplyLikeRequestDTO replyLikeRequestDTO = new ReplyLikeRequestDTO();

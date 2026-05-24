@@ -19,6 +19,16 @@ public class ReplyLikeDAO {
         replyLikeMapper.insert(replyLikeRequestDTO);
     }
 
+    //댓글 좋아요 취소
+    public void delete(ReplyLikeRequestDTO replyLikeRequestDTO) {
+        replyLikeMapper.delete(replyLikeRequestDTO);
+    }
+
+    // 댓글 모든 좋아요 삭제
+    public void deleteById(Long replyId) {
+        replyLikeMapper.deleteById(replyId);
+    }
+
     //댓글 좋아요 갯수, 해당 멤버가 좋아요를 클릭했는지 확인하는 기능
     public Optional<ReplyLikeResponseDTO> findReplyLikeCountAndIsLiked(ReplyLikeRequestDTO replyLikeRequestDTO) {
         return Optional.ofNullable(replyLikeMapper.selectLikeCountAndIsLiked(replyLikeRequestDTO));
