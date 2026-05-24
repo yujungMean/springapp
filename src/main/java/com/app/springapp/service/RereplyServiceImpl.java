@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
 import com.app.springapp.repository.ReplyDAO;
 import com.app.springapp.repository.RereplyDAO;
@@ -31,6 +32,12 @@ public class RereplyServiceImpl implements RereplyService {
     public void writeRereply(RereplyCreateRequestDTO rereplyCreateRequestDTO) {
         rereplyDAO.save(rereplyCreateRequestDTO);
     }
+
+    @Override
+    public void updateRereply(RereplyUpdateRequestDTO rereplyUpdateRequestDTO) {
+        rereplyDAO.update(rereplyUpdateRequestDTO);
+    }
+
 
     // 대댓글 삭제
     @Override

@@ -2,6 +2,7 @@ package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
 import com.app.springapp.domain.dto.request.ReplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.PostReadReplyResponseDTO;
 
 import java.util.List;
@@ -16,6 +17,9 @@ public interface ReplyService {
 
     //댓글 작성
     public void writeReply(ReplyCreateRequestDTO replyCreateRequestDTO);
+
+    //댓글 수정
+    public void updateReply(ReplyUpdateRequestDTO replyUpdateRequestDTO);
 
     //댓글 삭제
     public void deleteReply(Long replyId);

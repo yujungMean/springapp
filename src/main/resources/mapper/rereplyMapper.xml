@@ -20,6 +20,13 @@
         VALUES (SEQ_REREPLY.NEXTVAL, #{rereplyContent}, CURRENT_TIMESTAMP, #{replyId}, #{memberId})
     </insert>
 
+    <!-- 대댓글 수정 -->
+    <update id="updateRereplyContentById" parameterType="RereplyUpdateRequestDTO">
+        UPDATE TBL_REREPLY
+        SET REREPLY_CONTENT = #{rereplyContent}
+        WHERE ID = #{id}
+    </update>
+
     <!-- 대댓글 삭제 -->
     <delete id="delete" parameterType="Long">
         DELETE FROM TBL_REREPLY

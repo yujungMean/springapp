@@ -121,6 +121,22 @@ public class PostAPI {
                         "댓글 작성 성공"));
     }
 
+    //댓글 수정
+    @PutMapping("/update-reply")
+    @Operation(summary = "댓글 수정 서비스", description = "댓글을 수정하는 서비스")
+    @ApiResponse(responseCode = "201", description = "댓글 수정 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> updateRereply(@RequestBody ReplyUpdateRequestDTO replyUpdateRequestDTO) {
+
+        replyService.updateReply(replyUpdateRequestDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "댓글 수정 성공"));
+    }
+
     //댓글 삭제
     @DeleteMapping("/delete-reply/{id}")
     @Operation(summary = "댓글 삭제 서비스", description = "댓글id로 댓글을 삭제하는 서비스")
@@ -159,6 +175,22 @@ public class PostAPI {
                 .body(ApiResponseDTO.of(
                         true,
                         "대댓글 작성 성공"));
+    }
+
+    //대댓글 수정
+    @PutMapping("/update-rereply")
+    @Operation(summary = "대댓글 수정 서비스", description = "대댓글을 수정하는 서비스")
+    @ApiResponse(responseCode = "201", description = "대댓글 수정 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> updateRereply(@RequestBody RereplyUpdateRequestDTO rereplyUpdateRequestDTO) {
+
+        rereplyService.updateRereply(rereplyUpdateRequestDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "대댓글 수정 성공"));
     }
 
     //대댓글 삭제

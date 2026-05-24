@@ -3,6 +3,7 @@ package com.app.springapp.repository;
 import com.app.springapp.domain.dto.ReplyDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
 import com.app.springapp.domain.dto.request.ReplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyUpdateRequestDTO;
 import com.app.springapp.mapper.ReplyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,11 @@ public class ReplyDAO {
     // 댓글 작성
     public void save(ReplyCreateRequestDTO replyCreateRequestDTO) {
         replyMapper.insert(replyCreateRequestDTO);
+    }
+
+    // 댓글 수정
+    public void update(ReplyUpdateRequestDTO replyUpdateRequestDTO) {
+        replyMapper.updateReplyContentById(replyUpdateRequestDTO);
     }
 
     // 댓글 삭제

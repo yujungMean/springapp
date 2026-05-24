@@ -1,6 +1,7 @@
 package com.app.springapp.mapper;
 
 import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +14,9 @@ public interface RereplyMapper {
 
     // 대댓글 작성
     public void insert(RereplyCreateRequestDTO rereplyCreateRequestDTO);
+
+    // 대댓글 수정
+    public void updateRereplyContentById(RereplyUpdateRequestDTO rereplyUpdateRequestDTO);
 
     // 대댓글 삭제
     public void delete(Long id);

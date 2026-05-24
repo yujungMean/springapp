@@ -41,6 +41,13 @@
         VALUES (SEQ_REPLY.NEXTVAL, #{replyContent}, CURRENT_TIMESTAMP, #{postId}, #{memberId})
     </insert>
 
+    <!-- 댓글 수정 -->
+    <update id="updateReplyContentById" parameterType="ReplyUpdateRequestDTO">
+        UPDATE TBL_REPLY
+        SET REPLY_CONTENT = #{replyContent}
+        WHERE ID = #{id}
+    </update>
+
     <!-- 댓글 삭제 -->
     <delete id="delete" parameterType="Long">
         DELETE FROM TBL_REPLY

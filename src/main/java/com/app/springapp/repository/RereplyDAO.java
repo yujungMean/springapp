@@ -1,6 +1,7 @@
 package com.app.springapp.repository;
 
 import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
 import com.app.springapp.mapper.RereplyMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,10 @@ public class RereplyDAO {
     //대댓글 작성
     public void save(RereplyCreateRequestDTO rereplyCreateRequestDTO) {
         rereplyMapper.insert(rereplyCreateRequestDTO);
+    }
+
+    public void update(RereplyUpdateRequestDTO rereplyUpdateRequestDTO) {
+        rereplyMapper.updateRereplyContentById(rereplyUpdateRequestDTO);
     }
 
     //대댓글 삭제

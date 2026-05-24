@@ -3,6 +3,7 @@ package com.app.springapp.service;
 import com.app.springapp.domain.dto.ReplyDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
 import com.app.springapp.domain.dto.request.ReplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.PostReadReplyResponseDTO;
 import com.app.springapp.repository.ReplyDAO;
 import com.app.springapp.repository.ReplyLikeDAO;
@@ -48,6 +49,12 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public void writeReply(ReplyCreateRequestDTO replyCreateRequestDTO) {
         replyDAO.save(replyCreateRequestDTO);
+    }
+
+    // 댓글 수정
+    @Override
+    public void updateReply(ReplyUpdateRequestDTO replyUpdateRequestDTO) {
+        replyDAO.update(replyUpdateRequestDTO);
     }
 
     @Override

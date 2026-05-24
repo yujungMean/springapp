@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.RereplyCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.RereplyResponseDTO;
 
 import java.util.List;
@@ -11,6 +12,9 @@ public interface RereplyService {
 
     //대댓글 작성
     public void writeRereply(RereplyCreateRequestDTO rereplyCreateRequestDTO);
+
+    //대댓글 수정
+    public void updateRereply(RereplyUpdateRequestDTO rereplyUpdateRequestDTO);
 
     //대댓글 삭제
     public void deleteRereply(Long rereplyId);
