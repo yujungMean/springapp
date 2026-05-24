@@ -26,4 +26,14 @@ public class RereplyServiceTests {
         rereplyCreateRequestDTO.setRereplyContent("콘텐트 input");
         rereplyService.writeRereply(rereplyCreateRequestDTO);
     }
+
+    @Test
+    public void deleteRereplyTest() {
+        rereplyService.deleteRereply(56L);
+    }
+
+    @Test
+    public void deleteRereplyTestByRereplyId(){
+        rereplyService.deleteByRereplyId(59L);
+    }
 }

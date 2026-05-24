@@ -11,7 +11,7 @@
                  JOIN TBL_MEMBER TBM
                       ON TBR.MEMBER_ID = TBM.ID
         WHERE TBR.REPLY_ID = #{id}
-
+        ORDER BY REREPLY_CREATED_AT DESC
     </select>
 
     <!-- 대댓글 작성 -->
@@ -19,4 +19,16 @@
         INSERT INTO TBL_REREPLY
         VALUES (SEQ_REREPLY.NEXTVAL, #{rereplyContent}, CURRENT_TIMESTAMP, #{replyId}, #{memberId})
     </insert>
+
+    <!-- 대댓글 삭제 -->
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TBL_REREPLY
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- 댓글id로 대댓글 삭제(댓글 id에 붙어있는 대댓글을 전부 삭제한다) -->
+    <delete id="deleteByRereplyId" parameterType="Long">
+        DELETE FROM TBL_REREPLY
+        WHERE REPLY_ID = #{id}
+    </delete>
 </mapper>

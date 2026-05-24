@@ -53,6 +53,7 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public void deleteReply(Long replyId) {
         replyLikeDAO.deleteById(replyId);
+        rereplyDAO.deleteByRereplyId(replyId);
         replyDAO.delete(replyId);
     }
 }

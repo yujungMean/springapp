@@ -121,7 +121,7 @@ public class PostAPI {
                         "댓글 작성 성공"));
     }
 
-    //댓글 삭제(작업중)
+    //댓글 삭제
     @DeleteMapping("/delete-reply/{id}")
     @Operation(summary = "댓글 삭제 서비스", description = "댓글id로 댓글을 삭제하는 서비스")
     @ApiResponse(responseCode = "200", description = "댓글 삭제 완료")
@@ -159,5 +159,29 @@ public class PostAPI {
                 .body(ApiResponseDTO.of(
                         true,
                         "대댓글 작성 성공"));
+    }
+
+    //대댓글 삭제
+    @DeleteMapping("/delete-rereply/{id}")
+    @Operation(summary = "대댓글 삭제 서비스", description = "대댓글id로 대댓글을 삭제하는 서비스")
+    @ApiResponse(responseCode = "200", description = "대댓글 삭제 완료")
+    @ApiResponse(responseCode = "404", description = "대댓글 없음")
+    @Parameter(
+            name = "id",
+            description = "대댓글 번호",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1",
+            schema = @Schema(type = "number")
+    )
+    public ResponseEntity<ApiResponseDTO> deleteRereply(@PathVariable Long id) {
+
+        rereplyService.deleteRereply(id);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.of(
+                        true,
+                        "대댓글 삭제 성공"));
     }
 }

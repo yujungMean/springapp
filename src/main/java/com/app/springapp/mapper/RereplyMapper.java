@@ -13,4 +13,10 @@ public interface RereplyMapper {
 
     // 대댓글 작성
     public void insert(RereplyCreateRequestDTO rereplyCreateRequestDTO);
+
+    // 대댓글 삭제
+    public void delete(Long id);
+
+    // 대댓글 삭제(댓글 id를 입력값으로 해당 댓글에 달린 대댓글을 전부 삭제한다)
+    public void deleteByRereplyId(Long id);
 }
