@@ -8,6 +8,17 @@
         VALUES (SEQ_REPLY_LIKE.NEXTVAL, #{replyId}, #{memberId})
     </insert>
 
+    <delete id="delete" parameterType="ReplyLikeRequestDTO">
+        DELETE FROM TBL_REPLY_LIKE
+        WHERE REPLY_ID = #{replyId} AND MEMBER_ID = #{memberId}
+    </delete>
+
+    <!-- 댓글 모든 좋아요 삭제 -->
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM TBL_REPLY_LIKE
+        WHERE REPLY_ID = #{id}
+    </delete>
+
     <!-- 댓글 좋아요수와 해당 멤버가 댓글을 좋아요를 했는지 확인한다. -->
     <select id="selectLikeCountAndIsLiked" parameterType="ReplyLikeRequestDTO" resultType="ReplyLikeResponseDTO">
         SELECT

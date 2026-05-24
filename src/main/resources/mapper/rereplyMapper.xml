@@ -4,11 +4,38 @@
 
     <!-- 댓글id로 대댓글 목록 보여주기 -->
     <select id="selectAll" parameterType="Long" resultType="RereplyResponseDTO">
-        SELECT TBR.ID, TBR.REPLY_ID, TBR.REREPLY_CONTENT, TBR.REREPLY_CREATED_AT, TBR.MEMBER_ID, TBM.MEMBER_NICKNAME, TBM.MEMBER_PROFILE_IMAGE_URL
+        SELECT TBR.ID, TBR.REPLY_ID, TBR.REREPLY_CONTENT,
+               TO_CHAR(TBR.REREPLY_CREATED_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS REREPLY_CREATED_AT,
+               TBR.MEMBER_ID, TBM.MEMBER_NICKNAME, TBM.MEMBER_PROFILE_IMAGE_URL
         FROM TBL_REREPLY TBR
                  JOIN TBL_MEMBER TBM
                       ON TBR.MEMBER_ID = TBM.ID
         WHERE TBR.REPLY_ID = #{id}
-
+        ORDER BY REREPLY_CREATED_AT DESC
     </select>
+
+    <!-- 대댓글 작성 -->
+    <insert id="insert" parameterType="RereplyCreateRequestDTO">
+        INSERT INTO TBL_REREPLY
+        VALUES (SEQ_REREPLY.NEXTVAL, #{rereplyContent}, CURRENT_TIMESTAMP, #{replyId}, #{memberId})
+    </insert>
+
+    <!-- 대댓글 수정 -->
+    <update id="updateRereplyContentById" parameterType="RereplyUpdateRequestDTO">
+        UPDATE TBL_REREPLY
+        SET REREPLY_CONTENT = #{rereplyContent}
+        WHERE ID = #{id}
+    </update>
+
+    <!-- 대댓글 삭제 -->
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TBL_REREPLY
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- 댓글id로 대댓글 삭제(댓글 id에 붙어있는 대댓글을 전부 삭제한다) -->
+    <delete id="deleteByRereplyId" parameterType="Long">
+        DELETE FROM TBL_REREPLY
+        WHERE REPLY_ID = #{id}
+    </delete>
 </mapper>

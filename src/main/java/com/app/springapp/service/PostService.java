@@ -1,11 +1,8 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.PostCreateDTO;
 import com.app.springapp.domain.dto.request.PostReadRequestDTO;
-import com.app.springapp.domain.dto.response.PostAfterResponseDTO;
-import com.app.springapp.domain.dto.response.PostBeforeResponseDTO;
-import com.app.springapp.domain.dto.response.PostReadResponseDTO;
-import com.app.springapp.domain.dto.response.PostResponseDTO;
-import retrofit2.http.POST;
+import com.app.springapp.domain.dto.response.*;
 
 public interface PostService {
 
@@ -24,4 +21,7 @@ public interface PostService {
 
     //게시판 상세페이지에 모든 정보 불러오기
     public PostReadResponseDTO getPostDetailInfo(PostReadRequestDTO postReadRequestDTO);
+
+    //게시글 작성 (PostCreateResponseDTO는 새로 작성된 게시글 번호정보가 들어있다.)
+    public PostCreateResponseDTO writePost(PostCreateDTO postCreateDTO);
 }

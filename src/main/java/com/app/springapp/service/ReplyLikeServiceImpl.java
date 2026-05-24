@@ -18,11 +18,26 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
 
     private final ReplyLikeDAO replyLikeDAO;
 
+    // 게시글 좋아요
     @Override
-    public void likeReply(ReplyLikeRequestDTO replyLikeRequestDTO) {
+    public ReplyLikeResponseDTO likeReply(ReplyLikeRequestDTO replyLikeRequestDTO) {
         replyLikeDAO.save(replyLikeRequestDTO);
+        return findReplyLikeCountAndIsLiked(replyLikeRequestDTO);
     }
 
+    // 댓글 좋아요 취소
+    @Override
+    public ReplyLikeResponseDTO cancelReplyLike(ReplyLikeRequestDTO replyLikeRequestDTO) {
+        replyLikeDAO.delete(replyLikeRequestDTO);
+        return findReplyLikeCountAndIsLiked(replyLikeRequestDTO);
+    }
+
+    @Override
+    public void deleteById(Long replyId) {
+        replyLikeDAO.deleteById(replyId);
+    }
+
+    // 게시글 좋아요 조회
     @Override
     public ReplyLikeResponseDTO findReplyLikeCountAndIsLiked(ReplyLikeRequestDTO replyLikeRequestDTO) {
         return replyLikeDAO.findReplyLikeCountAndIsLiked(replyLikeRequestDTO).orElseThrow(() -> new ReplyLikeException("게시글 좋아요, 좋아요 여부를 불러오지 못했습니다.", HttpStatus.BAD_REQUEST));

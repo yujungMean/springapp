@@ -8,7 +8,7 @@
             TBR.ID,
             TBR.POST_ID,
             TBR.REPLY_CONTENT,
-            TBR.REPLY_CREATED_AT,
+            TO_CHAR(TBR.REPLY_CREATED_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS REPLY_CREATED_AT,
             TBM.ID                                                         AS MEMBER_ID,
             TBM.MEMBER_NICKNAME,
             TBM.MEMBER_PROFILE_IMAGE_URL,
@@ -34,5 +34,24 @@
         SELECT COUNT(*) AS REPLY_COUNT FROM TBL_REPLY
         WHERE MEMBER_ID = #{id}
     </select>
+
+    <!-- 댓글 작성 -->
+    <insert id="insert" parameterType="ReplyCreateRequestDTO">
+        INSERT INTO TBL_REPLY
+        VALUES (SEQ_REPLY.NEXTVAL, #{replyContent}, CURRENT_TIMESTAMP, #{postId}, #{memberId})
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="updateReplyContentById" parameterType="ReplyUpdateRequestDTO">
+        UPDATE TBL_REPLY
+        SET REPLY_CONTENT = #{replyContent}
+        WHERE ID = #{id}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TBL_REPLY
+        WHERE ID = #{id}
+    </delete>
 
 </mapper>

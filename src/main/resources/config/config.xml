@@ -11,6 +11,7 @@
         <typeAlias type="com.app.springapp.domain.dto.JwtTokenDTO" alias="JwtTokenDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.MemberDTO" alias="MemberDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.ReplyDTO" alias="ReplyDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.PostCreateDTO" alias="PostCreateDTO"/>
 
         <!-- DTO Request Alias -->
         <typeAlias type="com.app.springapp.domain.dto.request.AiChatRequestDTO" alias="AiChatRequestDTO"/>
