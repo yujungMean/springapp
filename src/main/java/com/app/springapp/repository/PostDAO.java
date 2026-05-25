@@ -54,4 +54,9 @@ public class PostDAO {
     public void update(PostUpdateRequestDTO postUpdateRequestDTO) {
         postMapper.update(postUpdateRequestDTO);
     }
+
+    //게시글 조회수 증가
+    public void increaseReadCount(Long postId) {
+        postMapper.updatePostReadCount(postId);
+    }
 }

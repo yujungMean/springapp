@@ -69,6 +69,9 @@ public class PostServiceImpl implements PostService {
         postReadResponseDTO.setMemberPostCount(countPost(memberId));
         postReadResponseDTO.setMemberReplyCount(replyService.countReply(memberId));
 
+        //게시글 조회수 증가
+        increaseReadCount(postReadRequestDTO.getPostId());
+
         return postReadResponseDTO;
     }
 
@@ -88,5 +91,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public void updatePost(PostUpdateRequestDTO postUpdateRequestDTO) {
         postDAO.update(postUpdateRequestDTO);
+    }
+
+    //게시글 조회수 증가
+    @Override
+    public void increaseReadCount(Long postId) {
+        postDAO.increaseReadCount(postId);
     }
 }

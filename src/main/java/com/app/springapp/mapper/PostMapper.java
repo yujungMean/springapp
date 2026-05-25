@@ -32,4 +32,7 @@ public interface PostMapper {
 
     //게시글 수정
     public void update(PostUpdateRequestDTO postUpdateRequestDTO);
+
+    //게시글 조회수 증가
+    public void updatePostReadCount(Long id);
 }

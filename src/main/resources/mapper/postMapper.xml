@@ -102,4 +102,11 @@
         SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, CATEGORY_ID= #{categoryId}
         WHERE ID = #{id}
     </update>
+
+    <!-- 게시글 조회수 증가 -->
+    <update id="updatePostReadCount" parameterType="Long">
+        UPDATE TBL_POST
+        SET POST_READ_COUNT = POST_READ_COUNT + 1
+        WHERE ID = #{id}
+    </update>
 </mapper>

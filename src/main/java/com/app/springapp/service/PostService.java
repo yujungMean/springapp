@@ -32,4 +32,7 @@ public interface PostService {
 
     //게시글 수정
     public void updatePost(PostUpdateRequestDTO postUpdateRequestDTO);
+
+    //게시글 조회수 증가
+    public void increaseReadCount(Long postId);
 }
