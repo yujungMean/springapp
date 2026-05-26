@@ -76,24 +76,32 @@ public class ChronologyServiceImpl implements ChronologyService {
                     "%s 님의 성과 분석 결과입니다.\n" +
                     "- 전체 이용자 중 상위 %.1f%%에 해당하는 체크리스트 달성률\n" +
                     "- 총 %d개의 체크리스트 완료 (이용자 평균 %d개)\n" +
-                    "- 가장 많이 달성한 체크리스트 Top3: %s\n\n" +
-                    "이 데이터를 바탕으로 이 사람의 성장 여정을 칭찬하고 앞으로의 방향을 격려하는 피드백을 " +
-                    "따뜻하고 진정성 있는 말투로 2~3문장 한국어로 작성해주세요. " +
-                    "수치를 직접 언급하되, 기계적이지 않고 코치가 직접 말하는 것처럼 써주세요.",
+                    "- 가장 많이 달성한 체크리스트 Top3: %s\n" +
+                    "- 이용자 평균 목표달성 기간: %d일\n\n" +
+                    "위 데이터를 바탕으로 이 사람의 성장 여정을 분석하고, 아래 항목을 모두 포함하여 " +
+                    "따뜻하고 진정성 있는 코치의 말투로 약 2000자 분량의 한국어 피드백을 작성해주세요.\n\n" +
+                    "1. 달성률과 체크리스트 수에 대한 구체적인 칭찬과 의미 부여\n" +
+                    "2. Top3 체크리스트에서 보이는 이 사람의 행동 패턴과 강점 분석\n" +
+                    "3. 앞으로의 성장을 위한 구체적인 조언과 방향 제시\n" +
+                    "4. 마무리 응원 메시지\n\n" +
+                    "수치를 자연스럽게 녹여 쓰되, 기계적이지 않고 코치가 직접 대화하는 것처럼 써주세요. " +
+                    "각 항목은 자연스럽게 이어지도록 단락 구분하여 작성해주세요.",
                     dto.getNickname(), dto.getPercentile(),
-                    dto.getTotalChecklists(), dto.getAvgUserChecklists(), top3Text
+                    dto.getTotalChecklists(), dto.getAvgUserChecklists(), top3Text,
+                    dto.getAvgDays()
             );
 
             OpenAiService openAiService = new OpenAiService(apiKey);
             List<ChatMessage> messages = new ArrayList<>();
             messages.add(new ChatMessage("system",
-                    "당신은 사용자의 목표 달성 데이터를 분석하고 성장을 격려하는 전문 코치입니다."));
+                    "당신은 사용자의 목표 달성 데이터를 분석하고 성장을 격려하는 전문 코치입니다. " +
+                    "요청한 분량(약 2000자)을 충실히 채워 상세하고 풍부한 피드백을 작성합니다."));
             messages.add(new ChatMessage("user", userPrompt));
 
             ChatCompletionRequest request = ChatCompletionRequest.builder()
                     .model(model)
                     .messages(messages)
-                    .maxTokens(300)
+                    .maxTokens(1500)
                     .build();
 
             return openAiService.createChatCompletion(request)
