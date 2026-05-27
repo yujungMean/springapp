@@ -8,12 +8,15 @@ import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,19 +32,22 @@ public class ChronologyServiceImpl implements ChronologyService {
     @Value("${openai.model}")
     private String model;
 
+    // 비동기 AI 피드백 임시 저장소 (projectId → feedback)
+    private final ConcurrentHashMap<Long, String> feedbackCache = new ConcurrentHashMap<>();
+
     @Override
     public ChronologyAnalysisResponseDTO getAnalysis(Long projectId) {
         String nickname = chronologyDAO.findNicknameByProjectId(projectId);
         if (nickname == null) nickname = "사용자";
 
-        int totalChecklists = chronologyDAO.countCompletedChecklistsByProjectId(projectId);
+        int totalChecklists  = chronologyDAO.countCompletedChecklistsByProjectId(projectId);
         int avgUserChecklists = chronologyDAO.findAvgCompletedChecklists();
-        int avgDays = chronologyDAO.findAvgProjectDays();
-        int projectCount = chronologyDAO.findAvgProjectCount();
+        int avgDays           = chronologyDAO.findAvgProjectDays();
+        int projectCount      = chronologyDAO.findAvgProjectCount();
 
         int membersWithMore = chronologyDAO.countMembersWithMoreChecklists(totalChecklists);
-        int totalMembers = chronologyDAO.countMembersWithChecklists();
-        double percentile = totalMembers > 0
+        int totalMembers    = chronologyDAO.countMembersWithChecklists();
+        double percentile   = totalMembers > 0
                 ? Math.round((double) membersWithMore / totalMembers * 100 * 10) / 10.0
                 : 50.0;
 
@@ -50,19 +56,36 @@ public class ChronologyServiceImpl implements ChronologyService {
                 ? Collections.emptyList()
                 : rawTop3.stream()
                         .map(row -> {
-                            String text = String.valueOf(row.getOrDefault("CHECKLIST_TEXT", ""));
-                            int count = row.get("CHECKLIST_COUNT") != null
+                            String text  = String.valueOf(row.getOrDefault("CHECKLIST_TEXT", ""));
+                            int count    = row.get("CHECKLIST_COUNT") != null
                                     ? ((Number) row.get("CHECKLIST_COUNT")).intValue() : 0;
                             return new ChronologyAnalysisResponseDTO.ChecklistStat(text, count);
                         })
                         .collect(Collectors.toList());
 
-        ChronologyAnalysisResponseDTO dto = new ChronologyAnalysisResponseDTO(
+        // AI 피드백 없이 즉시 반환
+        return new ChronologyAnalysisResponseDTO(
                 nickname, percentile, totalChecklists, avgUserChecklists, top3, avgDays, projectCount, null
         );
+    }
 
-        dto.setAiFeedback(generateAiFeedback(dto));
-        return dto;
+    @Override
+    @Async
+    public void generateAiFeedbackAsync(Long projectId, ChronologyAnalysisResponseDTO dto) {
+        // 이미 캐시에 있으면 재생성 안 함
+        if (feedbackCache.containsKey(projectId)) return;
+
+        log.info("[연대기] AI 피드백 비동기 생성 시작 - projectId: {}", projectId);
+        String feedback = generateAiFeedback(dto);
+        if (feedback != null) {
+            feedbackCache.put(projectId, feedback);
+            log.info("[연대기] AI 피드백 캐시 저장 완료 - projectId: {}", projectId);
+        }
+    }
+
+    @Override
+    public String getFeedback(Long projectId) {
+        return feedbackCache.get(projectId);
     }
 
     private String generateAiFeedback(ChronologyAnalysisResponseDTO dto) {
@@ -91,7 +114,8 @@ public class ChronologyServiceImpl implements ChronologyService {
                     dto.getAvgDays()
             );
 
-            OpenAiService openAiService = new OpenAiService(apiKey);
+            // 타임아웃 120초로 설정
+            OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(120));
             List<ChatMessage> messages = new ArrayList<>();
             messages.add(new ChatMessage("system",
                     "당신은 사용자의 목표 달성 데이터를 분석하고 성장을 격려하는 전문 코치입니다. " +

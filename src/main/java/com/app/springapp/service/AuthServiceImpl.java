@@ -57,13 +57,12 @@ public class AuthServiceImpl implements AuthService {
         MemberDTO foundMember = memberDAO
                 .findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
                 .orElseThrow(() -> {
-                    throw new MemberException("회원이 아닙니다.", HttpStatus.BAD_REQUEST);
+                    throw new MemberException("입력한 값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
                 });
 
         // 회원 비밀번호 일치 검사
-        // 화면에서 받은 비밀번호, DB에 있는 비밀번호 검사
         if(!passwordEncoder.matches(memberVO.getMemberPassword(), foundMember.getMemberPassword())){
-            throw new MemberException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new MemberException("입력한 값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
         // 토큰 생성(access, refresh)
@@ -133,16 +132,14 @@ public class AuthServiceImpl implements AuthService {
         return jwtTokenDTO;
     }
 
-    // 실무에서는 Access Token을 받는것이 관례
     @Override
     public void logout(JwtTokenDTO jwtTokenDTO) {
-        log.info("jwtTokenDTO: {}", jwtTokenDTO);
-        log.info("{}", validateRefreshToken(jwtTokenDTO));
-
-        if(validateRefreshToken(jwtTokenDTO)){
-            saveBlackListedToken(jwtTokenDTO);
-        }else {
-            throw new JwtTokenException("권한 없음", HttpStatus.UNAUTHORIZED);
+        try {
+            if (validateRefreshToken(jwtTokenDTO)) {
+                saveBlackListedToken(jwtTokenDTO);
+            }
+        } catch (Exception e) {
+            log.warn("[로그아웃] 토큰 검증 실패 - 쿠키 만료 처리는 계속 진행: {}", e.getMessage());
         }
     }
 
