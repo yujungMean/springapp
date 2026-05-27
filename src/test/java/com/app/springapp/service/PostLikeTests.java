@@ -38,6 +38,11 @@ public class PostLikeTests {
     }
 
     @Test
+    public void deletePostLikeAllTest() {
+        postLikeService.cancelPostLikeAll(28L);
+    }
+
+    @Test
     public void findPostLikeCountAndIsNotLikedTest() {
 
     }

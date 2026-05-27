@@ -18,4 +18,10 @@
         FROM TBL_POST_LIKE
         WHERE POST_ID = #{postId}
     </select>
+
+    <!-- 게시글 모든 좋아요 삭제 -->
+    <delete id="deleteByPostId" parameterType="Long">
+        DELETE FROM TBL_POST_LIKE
+        WHERE POST_ID = #{postId}
+    </delete>
 </mapper>

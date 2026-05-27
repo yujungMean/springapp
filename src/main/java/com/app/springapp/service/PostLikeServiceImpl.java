@@ -38,4 +38,10 @@ public class PostLikeServiceImpl implements PostLikeService {
         postLikeDAO.delete(postLikeRequestDTO);
         return findPostLikeCountAndIsLiked(postLikeRequestDTO);
     }
+
+    //게시글 모든 좋아요 삭제
+    @Override
+    public void cancelPostLikeAll(Long postId) {
+        postLikeDAO.deleteByPostId(postId);
+    }
 }

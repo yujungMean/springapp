@@ -16,5 +16,4 @@ public interface ReplyLikeService {
 
     // 해당 댓글 좋아요 조회
     public ReplyLikeResponseDTO findReplyLikeCountAndIsLiked(ReplyLikeRequestDTO replyLikeRequestDTO);
-
 }

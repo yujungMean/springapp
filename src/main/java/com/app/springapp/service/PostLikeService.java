@@ -9,4 +9,7 @@ public interface PostLikeService {
 
     // 게시글 좋아요 취소
     public PostLikeResponseDTO cancelPostLike(PostLikeRequestDTO postLikeRequestDTO);
+
+    // 게시글 모든 좋아요 취소
+    public void cancelPostLikeAll(Long postId);
 }
