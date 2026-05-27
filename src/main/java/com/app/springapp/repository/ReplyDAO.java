@@ -21,6 +21,11 @@ public class ReplyDAO {
         return replyMapper.selectAll(postReadRequestDTO);
     }
 
+    //게시글 id로 모든 댓글id 불러오기
+    public List<Long> findAllIdByPostId(Long id) {
+        return replyMapper.selectAllIdByPostId(id);
+    }
+
     // 작성자가 작성한 댓글 수
     public Integer countPost(Long memberId) {
         return replyMapper.selectReplyCountByMemberId(memberId);

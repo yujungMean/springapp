@@ -24,7 +24,13 @@ public class PostLikeDAO {
         return Optional.ofNullable(postLikeMapper.selectLikeCountAndIsLiked(postLikeRequestDTO));
     }
 
+    //해당 멤버가 특정 게시글 좋아요를 취소한다.
     public void delete(PostLikeRequestDTO postLikeRequestDTO) {
         postLikeMapper.delete(postLikeRequestDTO);
+    }
+
+    //게시글 모든 좋아요 삭제
+    public void deleteByPostId(Long id) {
+        postLikeMapper.deleteByPostId(id);
     }
 }

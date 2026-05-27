@@ -40,6 +40,11 @@ public class ReplyServiceImpl implements ReplyService {
                 .toList();
     }
 
+    @Override
+    public List<Long> findReplyIds(Long postId) {
+        return replyDAO.findAllIdByPostId(postId);
+    }
+
     //작성자가 작성한 댓글 수
     public Integer countReply(Long memberId) {
         return replyDAO.countPost(memberId);
@@ -57,10 +62,19 @@ public class ReplyServiceImpl implements ReplyService {
         replyDAO.update(replyUpdateRequestDTO);
     }
 
+    // 댓글 삭제
     @Override
     public void deleteReply(Long replyId) {
         replyLikeDAO.deleteById(replyId);
         rereplyDAO.deleteByRereplyId(replyId);
         replyDAO.delete(replyId);
     }
+
+    @Override
+    public void deleteReplies(Long postId) {
+        List<Long> replyIds = findReplyIds(postId);
+        replyIds.forEach(this::deleteReply);
+    }
+
+
 }

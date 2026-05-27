@@ -12,6 +12,9 @@ public interface ReplyService {
     // 게시글id와 멤버id로 댓글 정보(댓글에 달린 대댓글포함) 목록 불러오기
     public List<PostReadReplyResponseDTO> getPostReplies(PostReadRequestDTO postReadRequestDTO);
 
+    //게시글 id로 모든 댓글id 불러오기
+    public List<Long> findReplyIds(Long postId);
+
     //작성자가 작성한 댓글 수
     public Integer countReply(Long memberId);
 
@@ -23,4 +26,7 @@ public interface ReplyService {
 
     //댓글 삭제
     public void deleteReply(Long replyId);
+
+    //게시글에 달린 모든 댓글 삭제
+    public void deleteReplies(Long postId);
 }

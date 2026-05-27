@@ -8,5 +8,10 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PostLikeMapper {
     public void insert(PostLikeRequestDTO postLikeRequestDTO);
     public PostLikeResponseDTO selectLikeCountAndIsLiked(PostLikeRequestDTO postLikeRequestDTO);
+
+    //해당 멤버가 게시글 좋아요 1개 삭제
     public void delete(PostLikeRequestDTO postLikeRequestDTO);
+
+    //게시글 모든 좋아요 삭제
+    public void deleteByPostId(Long id);
 }

@@ -14,6 +14,9 @@ public interface ReplyMapper {
     // 게시글id와 멤버id로 댓글 정보 목록 불러오기
     public List<ReplyDTO> selectAll(PostReadRequestDTO postReadRequestDTO);
 
+    //게시글 id로 모든 댓글id 불러오기
+    public List<Long> selectAllIdByPostId(Long id);
+
     //작성자가 작성한 댓글 수
     public Integer selectReplyCountByMemberId(Long memberId);
 

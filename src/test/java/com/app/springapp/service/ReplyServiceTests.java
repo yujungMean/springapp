@@ -49,4 +49,14 @@ public class ReplyServiceTests {
     public void deleteReplyTest() {
         replyService.deleteReply(57L);
     }
+
+    @Test
+    public void findAllByPostIdTest() {
+        log.info("{}", replyService.findReplyIds(20L));
+    }
+
+    @Test
+    public void deleteRepliesTest() {
+        replyService.deleteReplies(28L);
+    }
 }
