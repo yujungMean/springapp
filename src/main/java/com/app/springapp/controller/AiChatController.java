@@ -27,7 +27,7 @@ public class AiChatController {
             @RequestBody AiChatRequestDTO request,
             @AuthenticationPrincipal MemberVO member) {
 
-        Long memberId = (member != null) ? member.getId() : 1L;
+        Long memberId = member.getId();
 
         log.info("AI 챗봇 요청 - memberId: {}, message: {}", memberId, request.getAiChatContent());
 
