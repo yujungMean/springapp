@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface GuestbookMapper {
     //  방명록 작성
-    public GuestbookCreateRequestDTO insert(GuestbookCreateRequestDTO guestbookCreateRequestDTO);
+    public void insert(GuestbookCreateRequestDTO guestbookCreateRequestDTO);
     //  방명록 목록 조회
     public List<GuestbookResponseDTO> selectListByOwnerMemberId(GuestbookResponseDTO guestbookResponseDTO);
     //  방명록 단건 조회

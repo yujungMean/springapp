@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
 @RequiredArgsConstructor
 public class GuestbookDAO {
@@ -17,8 +18,8 @@ public class GuestbookDAO {
     private final GuestbookMapper guestbookMapper;
 
     // 방명록 작성
-    public Optional<GuestbookCreateRequestDTO> save(GuestbookCreateRequestDTO guestbookCreateRequestDTO) {
-        return Optional.ofNullable(guestbookMapper.insert(guestbookCreateRequestDTO));
+    public void save(GuestbookCreateRequestDTO guestbookCreateRequestDTO) {
+        guestbookMapper.insert(guestbookCreateRequestDTO);
     }
 
     // 방명록 목록 조회

@@ -5,6 +5,7 @@ import com.app.springapp.domain.dto.response.GuestbookResponseDTO;
 import com.app.springapp.domain.vo.GuestbookVO;
 import com.app.springapp.exception.GuestbookException;
 import com.app.springapp.repository.GuestbookDAO;
+import com.app.springapp.repository.GuestbookReplyDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class GuestbookServiceImpl implements GuestbookService {
 
     private final GuestbookDAO guestbookDAO;
+    private final GuestbookReplyDAO guestbookReplyDAO;
 
     @Override
     public void createGuestbook(GuestbookCreateRequestDTO guestbookCreateRequestDTO) {
@@ -24,7 +26,12 @@ public class GuestbookServiceImpl implements GuestbookService {
 
     @Override
     public List<GuestbookResponseDTO> findAllByOwnerMemberId(GuestbookResponseDTO guestbookResponseDTO) {
-        return guestbookDAO.findAllByOwnerMemberId(guestbookResponseDTO).orElseThrow(() -> new GuestbookException("해당하는 유저가 없습니다."));
+        List<GuestbookResponseDTO> list = guestbookDAO.findAllByOwnerMemberId(guestbookResponseDTO)
+                .orElseThrow(() -> new GuestbookException("해당하는 유저가 없습니다."));
+        list.forEach(dto -> dto.setReplies(
+                guestbookReplyDAO.findAllByGuestbookId(dto.getId()).orElseGet(Collections::emptyList)
+        ));
+        return list;
     }
 
     @Override
