@@ -97,6 +97,7 @@
             <if test="memberNickname != null">MEMBER_NICKNAME = #{memberNickname},</if>
             <if test="memberProfileImageUrl != null">MEMBER_PROFILE_IMAGE_URL = #{memberProfileImageUrl},</if>
             <if test="memberPhone != null">MEMBER_PHONE = #{memberPhone},</if>
+            <if test="memberPhoneVerifiedAt != null">MEMBER_PHONE_VERIFIED_AT = CURRENT_TIMESTAMP,</if>
             <if test="memberPassword != null">MEMBER_PASSWORD = #{memberPassword},</if>
         </set>
         WHERE ID = #{id}
