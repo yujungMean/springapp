@@ -115,7 +115,7 @@ public class PostAPI {
             )
     })
     public ResponseEntity<ApiResponseDTO> getPostList(
-            @RequestParam(defaultValue = "1") int memberId,
+            @RequestParam(defaultValue = "1") Long memberId,
             @RequestParam(defaultValue = "0")  int order,
             @RequestParam(defaultValue = "1")  int page,
             @RequestParam(defaultValue = "") String content
