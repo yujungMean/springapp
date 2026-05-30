@@ -3,6 +3,6 @@
 <mapper namespace="com.app.springapp.mapper.ReplyReportMapper">
     <insert id="insert" parameterType="ReplyReportCreateRequestDTO">
         INSERT INTO TBL_REPLY_REPORT
-        VALUES (SEQ_REPLY_REPORT.NEXTVAL, #{replyReportContent}, CURRENT_TIMESTAMP, #{reportReasonCategoryId}, #{replyId}, #{memberId})
+        VALUES (SEQ_REPLY_REPORT.NEXTVAL, #{replyReportContent}, CURRENT_TIMESTAMP, #{memberId}, #{replyId}, #{reportReasonCategoryId})
     </insert>
 </mapper>
