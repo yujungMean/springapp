@@ -27,7 +27,7 @@ public class PostTests {
 
     @Test
     public void findBeforePostTest() {
-        log.info("{}", postService.findBeforePost(1L));
+        log.info("{}", postService.findBeforePost(2L));
     }
 
     @Test
