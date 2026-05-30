@@ -1,6 +1,8 @@
 package com.app.springapp.api;
 
 import com.app.springapp.domain.dto.request.PostReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyReportCreateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.PostReportService;
 import com.app.springapp.service.ReplyReportService;
@@ -50,9 +52,9 @@ public class CommunityReportAPI {
     @Operation(summary = "댓글 신고 서비스", description = "댓글을 신고하는 서비스")
     @ApiResponse(responseCode = "201", description = "댓글 신고 완료")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
-    public ResponseEntity<ApiResponseDTO> replyReport(@RequestBody PostReportCreateRequestDTO postReportCreateRequestDTO) {
+    public ResponseEntity<ApiResponseDTO> replyReport(@RequestBody ReplyReportCreateRequestDTO replyReportCreateRequestDTO) {
 
-        replyReportService.write(postReportCreateRequestDTO);
+        replyReportService.write(replyReportCreateRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -67,9 +69,9 @@ public class CommunityReportAPI {
     @Operation(summary = "대댓글 신고 서비스", description = "대댓글을 신고하는 서비스")
     @ApiResponse(responseCode = "201", description = "대댓글 신고 완료")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
-    public ResponseEntity<ApiResponseDTO> rereplyReport(@RequestBody PostReportCreateRequestDTO postReportCreateRequestDTO) {
+    public ResponseEntity<ApiResponseDTO> rereplyReport(@RequestBody RereplyReportCreateRequestDTO rereplyReportCreateRequestDTO) {
 
-        rereplyReportService.write(postReportCreateRequestDTO);
+        rereplyReportService.write(rereplyReportCreateRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

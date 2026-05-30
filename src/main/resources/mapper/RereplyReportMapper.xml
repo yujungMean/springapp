@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.springapp.mapper.RereplyReportMapper">
-    <insert id="insert" parameterType="PostReportCreateRequestDTO">
+    <insert id="insert" parameterType="RereplyReportCreateRequestDTO">
         INSERT INTO TBL_REREPLY_REPORT
-        VALUES (SEQ_REREPLY_REPORT.NEXTVAL, #{postReportContent}, CURRENT_TIMESTAMP, #{reportReasonCategoryId}, #{postId}, #{memberId})
+        VALUES (SEQ_REREPLY_REPORT.NEXTVAL, #{rereplyReportContent}, CURRENT_TIMESTAMP, #{reportReasonCategoryId}, #{rereplyId}, #{memberId})
     </insert>
 </mapper>

@@ -1,6 +1,6 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.PostReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyReportCreateRequestDTO;
 import com.app.springapp.repository.ReplyReportDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class ReplyReportServiceImpl implements ReplyReportService {
 
     //댓글 신고 작성
     @Override
-    public void write(PostReportCreateRequestDTO postReportCreateRequestDTO) {
-        replyReportDAO.save(postReportCreateRequestDTO);
+    public void write(ReplyReportCreateRequestDTO replyReportCreateRequestDTO) {
+        replyReportDAO.save(replyReportCreateRequestDTO);
     }
 }

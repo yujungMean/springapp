@@ -1,6 +1,6 @@
 package com.app.springapp.repository;
 
-import com.app.springapp.domain.dto.request.PostReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyReportCreateRequestDTO;
 import com.app.springapp.mapper.RereplyReportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -11,7 +11,7 @@ public class RereplyReportDAO {
 
     private final RereplyReportMapper rereplyReportMapper;
 
-    public void save(PostReportCreateRequestDTO postReportCreateRequestDTO) {
-        rereplyReportMapper.insert(postReportCreateRequestDTO);
+    public void save(RereplyReportCreateRequestDTO rereplyReportCreateRequestDTO) {
+        rereplyReportMapper.insert(rereplyReportCreateRequestDTO);
     }
 }

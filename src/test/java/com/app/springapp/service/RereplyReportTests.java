@@ -1,6 +1,6 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.PostReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.RereplyReportCreateRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,11 @@ public class RereplyReportTests {
 
     @Test
     public void writeTest() {
-        PostReportCreateRequestDTO postReportCreateRequestDTO = new PostReportCreateRequestDTO();
-        postReportCreateRequestDTO.setPostReportContent("테스트 신고2");
-        postReportCreateRequestDTO.setReportReasonCategoryId(2L);
-        postReportCreateRequestDTO.setPostId(1L);
-        postReportCreateRequestDTO.setMemberId(1L);
-        rereplyReportService.write(postReportCreateRequestDTO);
+        RereplyReportCreateRequestDTO rereplyReportCreateRequestDTO = new RereplyReportCreateRequestDTO();
+        rereplyReportCreateRequestDTO.setRereplyReportContent("테스트 신고22");
+        rereplyReportCreateRequestDTO.setReportReasonCategoryId(2L);
+        rereplyReportCreateRequestDTO.setRereplyId(1L);
+        rereplyReportCreateRequestDTO.setMemberId(1L);
+        rereplyReportService.write(rereplyReportCreateRequestDTO);
     }
 }

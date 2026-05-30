@@ -1,8 +1,8 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.PostReportCreateRequestDTO;
+import com.app.springapp.domain.dto.request.ReplyReportCreateRequestDTO;
 
 //댓글 신고
 public interface ReplyReportService {
-    public void write(PostReportCreateRequestDTO postReportCreateRequestDTO);
+    public void write(ReplyReportCreateRequestDTO replyReportCreateRequestDTO);
 }
