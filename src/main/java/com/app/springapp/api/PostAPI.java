@@ -94,6 +94,7 @@ public class PostAPI {
             )
     })
     public ResponseEntity<ApiResponseDTO> getPostList(
+            @RequestParam(defaultValue = "0")  Long memberId,
             @RequestParam(defaultValue = "0")  int order,
             @RequestParam(defaultValue = "0")  int order2,
             @RequestParam(defaultValue = "1")  int page,
@@ -107,7 +108,7 @@ public class PostAPI {
         params.put("page", page);
         params.put("category", category);
         params.put("content", content);
-        params.put("memberId", 1L);
+        params.put("memberId", memberId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDTO.of(
                 true,
                 "게시글 목록 조회 성공",
