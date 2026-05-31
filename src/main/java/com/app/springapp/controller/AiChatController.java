@@ -1,8 +1,8 @@
 package com.app.springapp.controller;
 
+import com.app.springapp.domain.dto.MemberDTO;
 import com.app.springapp.domain.dto.request.AiChatRequestDTO;
 import com.app.springapp.domain.dto.response.AiChatResponseDTO;
-import com.app.springapp.domain.vo.MemberVO;
 import com.app.springapp.service.AiChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ public class AiChatController {
     @Operation(summary = "AI 챗봇 메시지 전송", description = "사용자 메시지를 OpenAI에 전송하고 응답을 반환합니다.")
     public ResponseEntity<AiChatResponseDTO> chat(
             @RequestBody AiChatRequestDTO request,
-            @AuthenticationPrincipal MemberVO member) {
+            @AuthenticationPrincipal MemberDTO member) {
 
         Long memberId = member.getId();
 
