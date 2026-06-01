@@ -31,13 +31,13 @@ public class LogListResponseDTO {
     private String categoryName;
 
     @Schema(description = "조회수", example = "45")
-    private int logReadCount;
+    private int readCount;
 
     @Schema(description = "좋아요 수", example = "10")
     private int likeCount;
 
     @Schema(description = "썸네일 이미지 URL", example = "https://example.com/thumb.jpg")
-    private String logThumbnailUrl;
+    private String thumbnailUrl;
 
     @Schema(description = "로그 상태 (DRAFT / PUBLISHED)", example = "PUBLISHED",
             allowableValues = {"DRAFT", "PUBLISHED"})
@@ -46,9 +46,14 @@ public class LogListResponseDTO {
     @Schema(description = "진행률 (0~100)", example = "0")
     private int logProgress;
 
+<<<<<<< HEAD
     @Schema(description = "외부 요인 비율 (AI 분석, 0~100)", example = "60")
     private Long logResultExternalRatio;
 
     @Schema(description = "내부 요인 비율 (AI 분석, 0~100)", example = "40")
     private Long logResultInternalRatio;
+=======
+    @Schema(description = "현재 로그인된 사용자의 좋아요 여부", example = "true")
+    private boolean isLiked;
+>>>>>>> aa316ad143c21c09ce2dd3ebd76d0be95609c5c9
 }
