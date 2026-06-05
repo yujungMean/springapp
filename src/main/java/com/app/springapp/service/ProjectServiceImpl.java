@@ -448,6 +448,7 @@ public class ProjectServiceImpl implements ProjectService {
         dto.setProjectEndDate(vo.getProjectEndDate());
         dto.setProgressDay(vo.getProgressDay());
         dto.setProjectCreatedAt(vo.getProjectCreatedAt());
+        dto.setLogTitle(vo.getLogTitle());
         dto.setVisionTitle(vo.getVisionTitle());
 
         List<ProjectResponseDTO.AiSuggestionItem> aiSuggestions = new ArrayList<>();
