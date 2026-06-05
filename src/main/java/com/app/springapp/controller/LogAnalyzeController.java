@@ -43,12 +43,13 @@ public class LogAnalyzeController {
             memberId = ((MemberDTO) authentication.getPrincipal()).getId();
         }
         boolean shouldIncreaseReadCount = true;
+        String cookieName = "viewed_log_" + logId + (memberId != null ? "_" + memberId : "_guest");
 
         // 쿠키 검사 (동일 사용자의 중복 조회 방지)
         jakarta.servlet.http.Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (jakarta.servlet.http.Cookie cookie : cookies) {
-                if (cookie.getName().equals("viewed_log_" + logId)) {
+                if (cookie.getName().equals(cookieName)) {
                     shouldIncreaseReadCount = false;
                     break;
                 }
@@ -56,7 +57,7 @@ public class LogAnalyzeController {
         }
 
         if (shouldIncreaseReadCount) {
-            org.springframework.http.ResponseCookie newCookie = org.springframework.http.ResponseCookie.from("viewed_log_" + logId, "true")
+            org.springframework.http.ResponseCookie newCookie = org.springframework.http.ResponseCookie.from(cookieName, "true")
                     .maxAge(60 * 60 * 24)
                     .path("/")
                     .sameSite("Lax")
