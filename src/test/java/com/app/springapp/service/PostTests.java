@@ -156,17 +156,6 @@ public class PostTests {
     }
 
     @Test
-    public void findPostsExceptIdTest() {
-        log.info("{}", postService.findIdAndPostContentsExceptMemberId(1L));
-    }
-
-    @Test
-    public void findIdAndPostContentByIdTest() {
-
-        log.info("{}",postService.findIdAndPostContentById(1L));
-    }
-
-    @Test
     public void aiTest() {
         postService.getPostAiRecommand(1L);
     }
@@ -177,5 +166,20 @@ public class PostTests {
         postVO.setMemberId(1L);
         postVO.setId(1L);
         log.info("{}", postDAO.findByMemberIdAndPostId(postVO));
+    }
+
+    @Test
+    public void findPostIdAndPostContentByIdTest() {
+        log.info("{}", postService.findIdAndPostContentById(1L));
+    }
+
+    @Test
+    public void findIdAndPostContentExceptIdTest() {
+        log.info("{}", postDAO.findIdAndPostContentExceptId(1L));
+    }
+
+    @Test
+    public void aiTest2(){
+        log.info("{}", postService.getPostAiRecommand(1L, 1L));
     }
 }

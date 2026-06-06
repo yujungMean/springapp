@@ -460,6 +460,19 @@
         ORDER BY ID ASC
     </select>
 
+    <!-- 게시글id로 게시글id, 게시글 내용 불러오기 -->
+    <select id="selectIdAndPostContentById" parameterType="Long" resultType="PostVO">
+        SELECT ID, POST_CONTENT FROM TBL_POST
+        WHERE ID = #{id}
+    </select>
+
+    <!-- 게시글id를 제외한 모든 게시글 id, 내용 불러오기 -->
+    <select id="selectIdAndPostContentExceptId" parameterType="Long" resultType="PostVO">
+        SELECT ID, POST_CONTENT FROM TBL_POST
+        WHERE ID != #{id}
+        ORDER BY ID ASC
+    </select>
+
 
     <!-- memberId, postid로 게시글 불러온다 (좋아요 정보포함)-->
     <select id="selectByMemberIdAndPostId" parameterType="PostVO" resultType="PostListResponseDTO">

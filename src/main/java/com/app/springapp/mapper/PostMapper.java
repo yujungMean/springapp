@@ -63,10 +63,16 @@ public interface PostMapper {
     public void delete(Long id);
 
     //멤버의 게시글을 제외한 게시글 id, 게시글 내용 불러오기
-    public List<PostVO> selectIdAndPostContentExceptMemberId(long id);
+    public List<PostVO> selectIdAndPostContentExceptMemberId(Long id);
 
     //멤버id가 쓴게시글의 id와 게시글 내용 불러오기 (최신 1개만)
-    public PostVO selectIdAndPostContentByMemberId(long id);
+    public PostVO selectIdAndPostContentByMemberId(Long id);
+
+    //게시글 id로 게시글id와 게시글 내용 불러오기
+    public PostVO selectIdAndPostContentById(Long id);
+
+    //게시글 id를 제외한 모든 게시글id, 내용 불러오기
+    public List<PostVO> selectIdAndPostContentExceptId(Long id);
 
     public PostListResponseDTO selectByMemberIdAndPostId(PostVO postVO);
 }
