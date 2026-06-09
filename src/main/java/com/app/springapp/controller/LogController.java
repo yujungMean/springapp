@@ -89,10 +89,12 @@ public class LogController {
         }
 
         boolean shouldIncreaseReadCount = true;
+        String cookieName = "viewed_log_basic_" + id + (memberId != null ? "_" + memberId : "_guest");
+
         jakarta.servlet.http.Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (jakarta.servlet.http.Cookie cookie : cookies) {
-                if (cookie.getName().equals("viewed_log_basic_" + id)) {
+                if (cookie.getName().equals(cookieName)) {
                     shouldIncreaseReadCount = false;
                     break;
                 }
@@ -100,7 +102,7 @@ public class LogController {
         }
 
         if (shouldIncreaseReadCount) {
-            org.springframework.http.ResponseCookie newCookie = org.springframework.http.ResponseCookie.from("viewed_log_basic_" + id, "true")
+            org.springframework.http.ResponseCookie newCookie = org.springframework.http.ResponseCookie.from(cookieName, "true")
                     .maxAge(60 * 60 * 24)
                     .path("/")
                     .sameSite("Lax")

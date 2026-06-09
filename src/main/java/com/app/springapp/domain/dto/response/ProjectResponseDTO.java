@@ -26,6 +26,9 @@ public class ProjectResponseDTO {
     @Schema(description = "연결된 로그 ID", example = "1")
     private Long logId;
 
+    @Schema(description = "연결된 로그의 제목", example = "로그 제목입니다")
+    private String logTitle;
+
     @Schema(description = "연결된 로그의 비전 제목", example = "개발자로 성장하기")
     private String visionTitle;
 

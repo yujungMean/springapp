@@ -186,7 +186,7 @@
     <!-- 로그 조회수 +1 -->
     <update id="increaseReadCount" parameterType="long">
         UPDATE TBL_LOG
-        SET LOG_READ_COUNT = LOG_READ_COUNT + 1
+        SET LOG_READ_COUNT = NVL(LOG_READ_COUNT, 0) + 1
         WHERE ID = #{id}
           AND LOG_DELETED_AT IS NULL
     </update>
