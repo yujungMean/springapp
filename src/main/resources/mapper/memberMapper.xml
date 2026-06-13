@@ -97,6 +97,7 @@
         UPDATE TBL_MEMBER
         <set>
             <if test="memberNickname != null">MEMBER_NICKNAME = #{memberNickname},</if>
+            <if test="memberName != null">MEMBER_NAME = #{memberName},</if>
             <if test="memberProfileImageUrl != null">MEMBER_PROFILE_IMAGE_URL = #{memberProfileImageUrl},</if>
             <if test="memberPhone != null">MEMBER_PHONE = #{memberPhone},</if>
             <if test="memberPhoneVerifiedAt != null">MEMBER_PHONE_VERIFIED_AT = CURRENT_TIMESTAMP,</if>
@@ -132,6 +133,26 @@
         WHERE M.MEMBER_NAME  = #{memberName}
         AND   M.MEMBER_PHONE = #{memberPhone}
         FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <!-- 이메일 핸들(@ 앞부분)로 회원 조회 -->
+    <select id="selectByEmailHandle" parameterType="String" resultType="com.app.springapp.domain.dto.MemberDTO">
+        SELECT
+            M.ID,
+            M.MEMBER_EMAIL,
+            M.MEMBER_NICKNAME,
+            M.MEMBER_PROFILE_IMAGE_URL,
+            M.MEMBER_PROFILE_IMAGE_URL AS MEMBER_PICTURE
+        FROM TBL_MEMBER M
+        WHERE SUBSTR(M.MEMBER_EMAIL, 1, INSTR(M.MEMBER_EMAIL, '@') - 1) = #{handle}
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <!-- ID로 이메일 핸들(@ 앞부분) 조회 -->
+    <select id="selectHandleById" parameterType="Long" resultType="String">
+        SELECT SUBSTR(MEMBER_EMAIL, 1, INSTR(MEMBER_EMAIL, '@') - 1)
+        FROM TBL_MEMBER
+        WHERE ID = #{id}
     </select>
 
     <!--    충돌 해결 기원 주석 1    -->

@@ -25,4 +25,10 @@ public interface MemberMapper {
 
 //    이름 + 전화번호로 회원 조회 (이메일 찾기)
     public MemberDTO selectByMemberNameAndMemberPhone(MemberDTO memberDTO);
+
+//    이메일 핸들(아이디 부분)로 회원 조회
+    public MemberDTO selectByEmailHandle(String handle);
+
+//    ID로 이메일 핸들(아이디 부분) 조회
+    public String selectHandleById(Long id);
 }

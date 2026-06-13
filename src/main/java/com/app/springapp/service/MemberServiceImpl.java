@@ -2,6 +2,7 @@ package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.MemberDTO;
 import com.app.springapp.domain.dto.request.MemberPasswordUpdateRequestDTO;
+import com.app.springapp.domain.dto.request.MemberPasswordVerifyRequestDTO;
 import com.app.springapp.domain.dto.request.MemberUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.MemberResponseDTO;
@@ -122,6 +123,19 @@ public class MemberServiceImpl implements MemberService {
         return ApiResponseDTO.of(true, "비밀번호가 변경되었습니다.");
     }
 
+    // 비밀번호 확인
+    @Override
+    public ApiResponseDTO verifyPassword(Long id, MemberPasswordVerifyRequestDTO memberPasswordVerifyRequestDTO) {
+        MemberDTO foundMember = memberDAO.findMemberById(id)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        if (!passwordEncoder.matches(memberPasswordVerifyRequestDTO.getPassword(), foundMember.getMemberPassword())) {
+            throw new MemberException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        return ApiResponseDTO.of(true, "비밀번호가 확인되었습니다.");
+    }
+
     // 회원 탈퇴
     @Override
     public ApiResponseDTO withdraw(Long id) {
@@ -130,6 +144,33 @@ public class MemberServiceImpl implements MemberService {
 
         memberDAO.delete(id);
         return ApiResponseDTO.of(true, "회원 탈퇴가 완료되었습니다.");
+    }
+
+    // 이메일 핸들(@ 앞부분)로 공개 정보 조회
+    @Override
+    public ApiResponseDTO getByHandle(String handle) {
+        MemberDTO foundMember = memberDAO.findMemberByEmailHandle(handle)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        Map<String, Object> pub = new HashMap<>();
+        pub.put("memberId", foundMember.getId());
+        pub.put("memberNickname", foundMember.getMemberNickname());
+        pub.put("memberProfileImageUrl", foundMember.getMemberPicture());
+        pub.put("memberHandle", handle);
+
+        return ApiResponseDTO.of(true, "회원 공개 정보 조회 성공", pub);
+    }
+
+    // ID -> 이메일 핸들(@ 앞부분) 조회
+    @Override
+    public ApiResponseDTO getHandle(Long id) {
+        String handle = memberDAO.findHandleById(id)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("memberHandle", handle);
+
+        return ApiResponseDTO.of(true, "회원 핸들 조회 성공", data);
     }
 }
 
