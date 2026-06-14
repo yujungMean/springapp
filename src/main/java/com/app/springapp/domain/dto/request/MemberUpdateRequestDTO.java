@@ -12,6 +12,9 @@ public class MemberUpdateRequestDTO {
     @Schema(description = "닉네임", example = "새닉네임", required = false)
     private String memberNickname;
 
+    @Schema(description = "이름", example = "홍길동", required = false)
+    private String memberName;
+
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/image.jpg", required = false)
     private String memberProfileImageUrl;
 

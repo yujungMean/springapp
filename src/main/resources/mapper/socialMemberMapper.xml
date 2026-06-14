@@ -8,13 +8,39 @@
             ID,
             SOCIAL_MEMBER_PROVIDER_ID,
             SOCIAL_MEMBER_PROVIDER,
-            MEMBER_ID
+            MEMBER_ID,
+            SOCIAL_ACCESS_TOKEN,
+            SOCIAL_REFRESH_TOKEN
         ) VALUES (
             SEQ_SOCIAL_MEMBER.NEXTVAL,
             #{socialMemberProviderId},
             #{socialMemberProvider},
-            #{memberId}
+            #{memberId},
+            #{socialAccessToken},
+            #{socialRefreshToken}
         )
     </insert>
+
+    <!-- 회원 ID로 소셜 회원 정보 조회 -->
+    <select id="selectByMemberId" parameterType="Long" resultType="com.app.springapp.domain.vo.SocialMemberVO">
+        SELECT
+            ID,
+            SOCIAL_MEMBER_PROVIDER_ID  AS socialMemberProviderId,
+            SOCIAL_MEMBER_PROVIDER     AS socialMemberProvider,
+            MEMBER_ID                  AS memberId,
+            SOCIAL_ACCESS_TOKEN        AS socialAccessToken,
+            SOCIAL_REFRESH_TOKEN       AS socialRefreshToken
+        FROM TBL_SOCIAL_MEMBER
+        WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <!-- 소셜 로그인 토큰 갱신 -->
+    <update id="updateTokens" parameterType="com.app.springapp.domain.vo.SocialMemberVO">
+        UPDATE TBL_SOCIAL_MEMBER
+        SET SOCIAL_ACCESS_TOKEN = #{socialAccessToken},
+            SOCIAL_REFRESH_TOKEN = #{socialRefreshToken}
+        WHERE MEMBER_ID = #{memberId}
+          AND SOCIAL_MEMBER_PROVIDER = #{socialMemberProvider}
+    </update>
 
 </mapper>

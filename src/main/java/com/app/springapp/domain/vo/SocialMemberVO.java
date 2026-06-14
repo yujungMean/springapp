@@ -11,6 +11,8 @@ public class SocialMemberVO {
     private String socialMemberProviderId;
     private String socialMemberProvider;
     private Long memberId;
+    private String socialAccessToken;
+    private String socialRefreshToken;
 
     public static SocialMemberVO from(MemberDTO memberJoinDTO){
         SocialMemberVO socialMemberVO = new SocialMemberVO();
@@ -18,6 +20,8 @@ public class SocialMemberVO {
         socialMemberVO.setSocialMemberProviderId(memberJoinDTO.getSocialMemberProviderId());
         socialMemberVO.setSocialMemberProvider(memberJoinDTO.getSocialMemberProvider() != null ? memberJoinDTO.getSocialMemberProvider() : "local");
         socialMemberVO.setMemberId(memberJoinDTO.getMemberId());
+        socialMemberVO.setSocialAccessToken(memberJoinDTO.getSocialAccessToken());
+        socialMemberVO.setSocialRefreshToken(memberJoinDTO.getSocialRefreshToken());
         return socialMemberVO;
     }
 }
