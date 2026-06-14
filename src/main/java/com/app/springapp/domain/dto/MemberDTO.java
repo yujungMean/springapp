@@ -24,6 +24,8 @@ public class MemberDTO {
     private String memberPhoneVerifiedAt;
     private String socialMemberProviderId;
     private String socialMemberProvider;
+    private String socialAccessToken;
+    private String socialRefreshToken;
     private Long memberId;
     private Long memberLoginStreak;
     private LocalDateTime memberLastLoginAt;

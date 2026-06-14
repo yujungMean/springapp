@@ -55,4 +55,14 @@ public class MemberDAO {
         memberDTO.setMemberPhone(memberPhone);
         return Optional.ofNullable(memberMapper.selectByMemberNameAndMemberPhone(memberDTO));
     }
+
+//    이메일 핸들(@ 앞부분)로 회원 조회
+    public Optional<MemberDTO> findMemberByEmailHandle(String handle){
+        return Optional.ofNullable(memberMapper.selectByEmailHandle(handle));
+    }
+
+//    ID로 이메일 핸들(@ 앞부분) 조회
+    public Optional<String> findHandleById(Long id){
+        return Optional.ofNullable(memberMapper.selectHandleById(id));
+    }
 }

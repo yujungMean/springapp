@@ -53,10 +53,22 @@ public class LogController {
         return ResponseEntity.ok(logService.getLogListByCategory(category, page, size, sort));
     }
 
-    // 내 로그 목록 전체 조회 - GET /api/logs/my-list (프로젝트 생성 모달용, JWT 필요)
-    @Operation(summary = "내 로그 목록 조회", description = "로그인한 사용자의 로그 목록을 전체 반환합니다.")
+    // 내 로그 목록 또는 특정 사용자의 로그 목록 조회 - GET /api/logs/my-list
+    @Operation(summary = "로그 목록 조회 (본인 또는 타인)", description = "memberId 파라미터가 있으면 해당 사용자의 글을, 없으면 로그인한 자신의 글을 조회합니다.")
     @GetMapping("/my-list")
-    public ResponseEntity<ApiResponseDTO> getMyLogList(Authentication authentication) {
+    public ResponseEntity<ApiResponseDTO> getMyLogList(
+            @RequestParam(required = false) Long memberId,
+            Authentication authentication) {
+
+        // 1. 만약 프론트엔드에서 특정 사용자의 memberId를 보냈다면 그 ID로 조회
+        if (memberId != null) {
+            return ResponseEntity.ok(logService.getMyLogList(memberId));
+        }
+
+        // 2. 파라미터가 없다면 기존처럼 로그인한 본인의 ID로 조회 (로그인 필수)
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(new ApiResponseDTO(false, "인증 정보가 없습니다.", null));
+        }
         MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
         return ResponseEntity.ok(logService.getMyLogList(memberDTO.getId()));
     }

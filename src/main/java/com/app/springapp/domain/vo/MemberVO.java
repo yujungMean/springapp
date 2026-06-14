@@ -42,7 +42,7 @@ public class MemberVO {
         memberVO.setMemberPhone(memberDTO.getMemberPhone());
         memberVO.setMemberNickname(memberDTO.getMemberNickname() != null ? memberDTO.getMemberNickname() : "개복치 1단계");
         memberVO.setMemberCreatedAt(memberDTO.getMemberCreatedAt());
-        memberVO.setMemberProfileImageUrl(memberDTO.getMemberProfileImageUrl() != null ? memberDTO.getMemberProfileImageUrl() : "https://testapp-codefuling.s3.ap-northeast-2.amazonaws.com/cat.jpg");
+        memberVO.setMemberProfileImageUrl(memberDTO.getMemberProfileImageUrl());
         memberVO.setMemberEmailVerifiedAt(memberDTO.getMemberEmailVerifiedAt());
         memberVO.setMemberPhoneVerifiedAt(memberDTO.getMemberPhoneVerifiedAt());
         memberVO.setMemberLoginStreak(memberDTO.getMemberLoginStreak());
