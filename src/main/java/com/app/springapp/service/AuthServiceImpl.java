@@ -105,6 +105,14 @@ public class AuthServiceImpl implements AuthService {
 
             claims.put("id", foundMember.getId().toString());
 
+            // 소셜 플랫폼 토큰 갱신
+            SocialMemberVO socialMemberVO = new SocialMemberVO();
+            socialMemberVO.setMemberId(foundMember.getId());
+            socialMemberVO.setSocialMemberProvider(memberDTO.getSocialMemberProvider());
+            socialMemberVO.setSocialAccessToken(memberDTO.getSocialAccessToken());
+            socialMemberVO.setSocialRefreshToken(memberDTO.getSocialRefreshToken());
+            socialMemberDAO.updateTokens(socialMemberVO);
+
         }else {
             // 만약 유저가 없다면 회원가입 후 -> 토큰 발급
             MemberVO memberVO = MemberVO.from(memberDTO);

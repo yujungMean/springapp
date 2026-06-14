@@ -5,6 +5,8 @@ import com.app.springapp.mapper.SocialMemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class SocialMemberDAO {
@@ -13,5 +15,15 @@ public class SocialMemberDAO {
 //    소셜 회원 추가
     public void save(SocialMemberVO socialMemberVO){
         socialMemberMapper.insert(socialMemberVO);
+    }
+
+//    회원 ID로 소셜 회원 정보 조회
+    public Optional<SocialMemberVO> findByMemberId(Long memberId){
+        return Optional.ofNullable(socialMemberMapper.selectByMemberId(memberId));
+    }
+
+//    소셜 로그인 토큰 갱신
+    public void updateTokens(SocialMemberVO socialMemberVO){
+        socialMemberMapper.updateTokens(socialMemberVO);
     }
 }

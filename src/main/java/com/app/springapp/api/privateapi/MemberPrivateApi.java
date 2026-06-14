@@ -2,6 +2,7 @@ package com.app.springapp.api.privateapi;
 
 import com.app.springapp.domain.dto.MemberDTO;
 import com.app.springapp.domain.dto.request.MemberPasswordUpdateRequestDTO;
+import com.app.springapp.domain.dto.request.MemberPasswordVerifyRequestDTO;
 import com.app.springapp.domain.dto.request.MemberUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.MemberService;
@@ -53,6 +54,18 @@ public class MemberPrivateApi {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(memberService.updatePassword(memberDTO.getId(), dto));
+    }
+
+    // 비밀번호 확인
+    @Operation(summary = "비밀번호 확인", description = "현재 비밀번호가 일치하는지 확인합니다.")
+    @PostMapping("/verify-password")
+    public ResponseEntity<ApiResponseDTO> verifyPassword(
+            Authentication authentication,
+            @RequestBody MemberPasswordVerifyRequestDTO dto) {
+        MemberDTO memberDTO = getMemberFromAuth(authentication);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(memberService.verifyPassword(memberDTO.getId(), dto));
     }
 
     // 회원 탈퇴
