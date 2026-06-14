@@ -2,6 +2,7 @@ package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.MemberDTO;
 import com.app.springapp.domain.dto.request.MemberPasswordUpdateRequestDTO;
+import com.app.springapp.domain.dto.request.MemberPasswordVerifyRequestDTO;
 import com.app.springapp.domain.dto.request.MemberUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.MemberResponseDTO;
@@ -12,10 +13,17 @@ import com.app.springapp.repository.MemberDAO;
 import com.app.springapp.repository.SocialMemberDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +37,13 @@ public class MemberServiceImpl implements MemberService {
     private final MemberDAO memberDAO;
     private final SocialMemberDAO socialMemberDAO;
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientSecret;
 
 //    회원 가입
     @Override
@@ -122,14 +137,112 @@ public class MemberServiceImpl implements MemberService {
         return ApiResponseDTO.of(true, "비밀번호가 변경되었습니다.");
     }
 
+    // 비밀번호 확인
+    @Override
+    public ApiResponseDTO verifyPassword(Long id, MemberPasswordVerifyRequestDTO memberPasswordVerifyRequestDTO) {
+        MemberDTO foundMember = memberDAO.findMemberById(id)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        if (!passwordEncoder.matches(memberPasswordVerifyRequestDTO.getPassword(), foundMember.getMemberPassword())) {
+            throw new MemberException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        return ApiResponseDTO.of(true, "비밀번호가 확인되었습니다.");
+    }
+
     // 회원 탈퇴
     @Override
     public ApiResponseDTO withdraw(Long id) {
         memberDAO.findMemberById(id)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
 
-        memberDAO.delete(id);
+        socialMemberDAO.findByMemberId(id).ifPresent(this::unlinkSocialMember);
+        socialMemberDAO.invalidateByMemberId(id);
+
+        memberDAO.withdrawMember(id);
         return ApiResponseDTO.of(true, "회원 탈퇴가 완료되었습니다.");
+    }
+
+    // 소셜 플랫폼 연결 해제
+    private void unlinkSocialMember(SocialMemberVO socialMemberVO) {
+        String provider = socialMemberVO.getSocialMemberProvider();
+        String accessToken = socialMemberVO.getSocialAccessToken();
+
+        if ("local".equals(provider) || accessToken == null) {
+            return;
+        }
+
+        try {
+            switch (provider) {
+                case "kakao" -> unlinkKakao(accessToken);
+                case "google" -> revokeGoogle(accessToken);
+                case "naver" -> unlinkNaver(accessToken);
+                default -> log.warn("[회원 탈퇴] 알 수 없는 소셜 플랫폼: {}", provider);
+            }
+        } catch (Exception e) {
+            log.warn("[회원 탈퇴] 소셜 플랫폼 연결 해제 실패 - provider: {}, message: {}", provider, e.getMessage());
+        }
+    }
+
+    // 카카오 연결 해제
+    private void unlinkKakao(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
+        restTemplate.postForEntity("https://kapi.kakao.com/v1/user/unlink", request, String.class);
+    }
+
+    // 구글 토큰 해지
+    private void revokeGoogle(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("token", accessToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        restTemplate.postForEntity("https://oauth2.googleapis.com/revoke", request, String.class);
+    }
+
+    // 네이버 연결 해제
+    private void unlinkNaver(String accessToken) {
+        String url = "https://nid.naver.com/oauth2.0/token"
+                + "?grant_type=delete"
+                + "&client_id=" + naverClientId
+                + "&client_secret=" + naverClientSecret
+                + "&access_token=" + accessToken
+                + "&service_provider=NAVER";
+
+        restTemplate.getForEntity(url, String.class);
+    }
+
+    // 이메일 핸들(@ 앞부분)로 공개 정보 조회
+    @Override
+    public ApiResponseDTO getByHandle(String handle) {
+        MemberDTO foundMember = memberDAO.findMemberByEmailHandle(handle)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        Map<String, Object> pub = new HashMap<>();
+        pub.put("memberId", foundMember.getId());
+        pub.put("memberNickname", foundMember.getMemberNickname());
+        pub.put("memberProfileImageUrl", foundMember.getMemberPicture());
+        pub.put("memberHandle", handle);
+
+        return ApiResponseDTO.of(true, "회원 공개 정보 조회 성공", pub);
+    }
+
+    // ID -> 이메일 핸들(@ 앞부분) 조회
+    @Override
+    public ApiResponseDTO getHandle(Long id) {
+        String handle = memberDAO.findHandleById(id)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("memberHandle", handle);
+
+        return ApiResponseDTO.of(true, "회원 핸들 조회 성공", data);
     }
 }
 

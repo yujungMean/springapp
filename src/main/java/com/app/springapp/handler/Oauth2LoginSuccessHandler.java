@@ -2,6 +2,7 @@ package com.app.springapp.handler;
 
 import com.app.springapp.domain.dto.JwtTokenDTO;
 import com.app.springapp.domain.dto.MemberDTO;
+import com.app.springapp.exception.MemberException;
 import com.app.springapp.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -25,6 +28,7 @@ import java.util.Map;
 public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final AuthService authService;
+    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -65,7 +69,29 @@ public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             memberDTO.setMemberName(memberName);
             memberDTO.setSocialMemberProvider(socialMemberProvider);
 
-            JwtTokenDTO jwtTokenDTO = authService.socialLogin(memberDTO);
+            // 닉네임 초기값: 이메일의 @ 앞부분으로 설정
+            if(memberEmail != null && memberEmail.contains("@")){
+                memberDTO.setMemberNickname(memberEmail.substring(0, memberEmail.indexOf("@")));
+            }
+
+            OAuth2AuthorizedClient authorizedClient = oAuth2AuthorizedClientService
+                    .loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+
+            if(authorizedClient != null){
+                memberDTO.setSocialAccessToken(authorizedClient.getAccessToken().getTokenValue());
+                if(authorizedClient.getRefreshToken() != null){
+                    memberDTO.setSocialRefreshToken(authorizedClient.getRefreshToken().getTokenValue());
+                }
+            }
+
+            JwtTokenDTO jwtTokenDTO;
+            try {
+                jwtTokenDTO = authService.socialLogin(memberDTO);
+            } catch (MemberException e) {
+                log.warn("[소셜 로그인 실패]: {}", e.getMessage());
+                getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/login?error=withdrawn");
+                return;
+            }
 
             ResponseCookie accessTokenCookie = ResponseCookie
                     .from("accessToken", jwtTokenDTO.getAccessToken())

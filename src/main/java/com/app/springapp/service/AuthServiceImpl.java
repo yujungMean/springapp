@@ -60,6 +60,11 @@ public class AuthServiceImpl implements AuthService {
                     throw new MemberException("입력한 값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
                 });
 
+        // 탈퇴한 회원 검사
+        if(foundMember.getMemberWithdrawnAt() != null){
+            throw new MemberException("탈퇴한 계정입니다.", HttpStatus.FORBIDDEN);
+        }
+
         // 회원 비밀번호 일치 검사
         if(!passwordEncoder.matches(memberVO.getMemberPassword(), foundMember.getMemberPassword())){
             throw new MemberException("입력한 값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
@@ -103,7 +108,20 @@ public class AuthServiceImpl implements AuthService {
                     .findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
                     .orElseThrow(() -> { throw new MemberException("socialLogin 회원 조회 실패", HttpStatus.BAD_REQUEST);});
 
+            // 탈퇴한 회원 검사
+            if(foundMember.getMemberWithdrawnAt() != null){
+                throw new MemberException("탈퇴한 계정입니다.", HttpStatus.FORBIDDEN);
+            }
+
             claims.put("id", foundMember.getId().toString());
+
+            // 소셜 플랫폼 토큰 갱신
+            SocialMemberVO socialMemberVO = new SocialMemberVO();
+            socialMemberVO.setMemberId(foundMember.getId());
+            socialMemberVO.setSocialMemberProvider(memberDTO.getSocialMemberProvider());
+            socialMemberVO.setSocialAccessToken(memberDTO.getSocialAccessToken());
+            socialMemberVO.setSocialRefreshToken(memberDTO.getSocialRefreshToken());
+            socialMemberDAO.updateTokens(socialMemberVO);
 
         }else {
             // 만약 유저가 없다면 회원가입 후 -> 토큰 발급

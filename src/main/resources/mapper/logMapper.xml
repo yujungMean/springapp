@@ -10,12 +10,14 @@
         TBL.ID AS id, TBL.LOG_TITLE AS logTitle, TBL.VISION_TITLE AS visionTitle,
         TO_CHAR(TBL.LOG_CREATED_AT, 'YYYY.MM.DD') AS logCreatedAt,
         TBL.LOG_READ_COUNT AS readCount, TBL.LOG_THUMBNAIL_URL AS thumbnailUrl,
-        TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
+        TBM.ID AS memberId, TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
         TBC.CATEGORY_NAME AS categoryName,
         (SELECT COUNT(*) FROM TBL_LOG_LIKE TBL_LIKE WHERE TBL_LIKE.LOG_ID = TBL.ID) AS likeCount
         FROM TBL_LOG TBL
         JOIN TBL_MEMBER TBM ON TBL.MEMBER_ID = TBM.ID
         JOIN TBL_CATEGORY TBC ON TBL.CATEGORY_ID = TBC.ID
+        WHERE TBL.LOG_STATUS = 'PUBLISHED'
+          AND TBL.LOG_DELETED_AT IS NULL
         <choose>
             <when test="sort == '좋아요순'">ORDER BY likeCount DESC, TBL.ID DESC</when>
             <when test="sort == '조회순'">ORDER BY TBL.LOG_READ_COUNT DESC, TBL.ID DESC</when>
@@ -30,13 +32,15 @@
         TBL.ID AS id, TBL.LOG_TITLE AS logTitle, TBL.VISION_TITLE AS visionTitle,
         TO_CHAR(TBL.LOG_CREATED_AT, 'YYYY.MM.DD') AS logCreatedAt,
         TBL.LOG_READ_COUNT AS readCount, TBL.LOG_THUMBNAIL_URL AS thumbnailUrl,
-        TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
+        TBM.ID AS memberId, TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
         TBC.CATEGORY_NAME AS categoryName,
         (SELECT COUNT(*) FROM TBL_LOG_LIKE TBL_LIKE WHERE TBL_LIKE.LOG_ID = TBL.ID) AS likeCount
         FROM TBL_LOG TBL
         JOIN TBL_MEMBER TBM ON TBL.MEMBER_ID = TBM.ID
         JOIN TBL_CATEGORY TBC ON TBL.CATEGORY_ID = TBC.ID
         WHERE LOWER(TBL.LOG_TITLE) LIKE LOWER('%' || #{keyword} || '%')
+          AND TBL.LOG_STATUS = 'PUBLISHED'
+          AND TBL.LOG_DELETED_AT IS NULL
         <choose>
             <when test="sort == '좋아요순'">ORDER BY likeCount DESC, TBL.ID DESC</when>
             <when test="sort == '조회순'">ORDER BY TBL.LOG_READ_COUNT DESC, TBL.ID DESC</when>
@@ -51,13 +55,15 @@
         TBL.ID AS id, TBL.LOG_TITLE AS logTitle, TBL.VISION_TITLE AS visionTitle,
         TO_CHAR(TBL.LOG_CREATED_AT, 'YYYY.MM.DD') AS logCreatedAt,
         TBL.LOG_READ_COUNT AS readCount, TBL.LOG_THUMBNAIL_URL AS thumbnailUrl,
-        TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
+        TBM.ID AS memberId, TBM.MEMBER_NICKNAME AS memberNickname, TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
         TBC.CATEGORY_NAME AS categoryName,
         (SELECT COUNT(*) FROM TBL_LOG_LIKE TBL_LIKE WHERE TBL_LIKE.LOG_ID = TBL.ID) AS likeCount
         FROM TBL_LOG TBL
         JOIN TBL_MEMBER TBM ON TBL.MEMBER_ID = TBM.ID
         JOIN TBL_CATEGORY TBC ON TBL.CATEGORY_ID = TBC.ID
         WHERE TBC.CATEGORY_NAME = #{category}
+          AND TBL.LOG_STATUS = 'PUBLISHED'
+          AND TBL.LOG_DELETED_AT IS NULL
         <choose>
             <when test="sort == '좋아요순'">ORDER BY likeCount DESC, TBL.ID DESC</when>
             <when test="sort == '조회순'">ORDER BY TBL.LOG_READ_COUNT DESC, TBL.ID DESC</when>
@@ -75,9 +81,13 @@
         TO_CHAR(TBL.LOG_CREATED_AT, 'YYYY.MM.DD') AS logCreatedAt,
         TBL.LOG_READ_COUNT AS readCount,
         TBL.LOG_THUMBNAIL_URL AS thumbnailUrl,
+        TBL.LOG_STATUS AS logStatus,
+        TBL.LOG_PROGRESS AS logProgress,
         TBM.MEMBER_NICKNAME AS memberNickname,
         TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
         TBC.CATEGORY_NAME AS categoryName,
+        TBL.LOG_STATUS AS logStatus,
+        TBL.LOG_PROGRESS AS logProgress,
         (SELECT COUNT(*) FROM TBL_LOG_LIKE TBL_LIKE WHERE TBL_LIKE.LOG_ID = TBL.ID) AS likeCount,
         TLR.LOG_RESULT_EXTERNAL_RATIO AS logResultExternalRatio,
         TLR.LOG_RESULT_INTERNAL_RATIO AS logResultInternalRatio
@@ -99,6 +109,8 @@
         TO_CHAR(TBL.LOG_CREATED_AT, 'YYYY.MM.DD') AS logCreatedAt,
         TBL.LOG_READ_COUNT AS readCount,
         TBL.LOG_THUMBNAIL_URL AS thumbnailUrl,
+        TBL.LOG_STATUS AS logStatus,
+        TBL.LOG_PROGRESS AS logProgress,
         TBM.MEMBER_NICKNAME AS memberNickname,
         TBM.MEMBER_PROFILE_IMAGE_URL AS memberProfileImageUrl,
         TBC.CATEGORY_NAME AS categoryName,
@@ -129,6 +141,19 @@
             #{logStatus, jdbcType=VARCHAR}, #{logProgress}
         )
     </insert>
+
+    <!-- 로그 수정 -->
+    <update id="updateLog" parameterType="com.app.springapp.domain.vo.LogVO">
+        UPDATE TBL_LOG
+        SET LOG_TITLE = #{logTitle},
+            VISION_TITLE = #{visionTitle},
+            LOG_CONTENT = #{logContent},
+            LOG_THUMBNAIL_URL = #{logThumbnailUrl},
+            CATEGORY_ID = #{categoryId},
+            LOG_STATUS = #{logStatus, jdbcType=VARCHAR},
+            LOG_PROGRESS = #{logProgress}
+        WHERE ID = #{id} AND MEMBER_ID = #{memberId}
+    </update>
 
     <!-- 로그 상세 조회 (단건) -->
     <select id="selectById" parameterType="long" resultType="LogResponseDTO">
@@ -162,6 +187,7 @@
             SELECT
                 TBL.ID                          AS logId,
                 TBL.LOG_TITLE                   AS logTitle,
+                TBM.ID                          AS memberId,
                 TBM.MEMBER_NICKNAME             AS memberNickname,
                 TBM.MEMBER_PROFILE_IMAGE_URL    AS memberProfileImageUrl,
                 TBR.LOG_RESULT_FAILURE_TYPE     AS logResultFailureType,
@@ -173,11 +199,12 @@
             LEFT JOIN TBL_LOG_RESULT TBR ON TBR.LOG_ID = TBL.ID
             LEFT JOIN TBL_LOG_LIKE TLL   ON TLL.LOG_ID = TBL.ID
             WHERE TBL.LOG_DELETED_AT IS NULL
+              AND TBL.LOG_STATUS = 'PUBLISHED'
             GROUP BY
                 TBL.ID, TBL.LOG_TITLE,
-                TBM.MEMBER_NICKNAME, TBM.MEMBER_PROFILE_IMAGE_URL,
+                TBM.ID, TBM.MEMBER_NICKNAME, TBM.MEMBER_PROFILE_IMAGE_URL,
                 TBR.LOG_RESULT_FAILURE_TYPE, TBR.LOG_RESULT_FAILURE_TITLE, TBR.LOG_RESULT_FAILURE_DESC
-            HAVING COUNT(TLL.ID) >= 10
+            HAVING COUNT(TLL.ID) >= 1
             ORDER BY likeCount DESC
         )
         WHERE ROWNUM &lt;= 5
