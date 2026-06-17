@@ -423,14 +423,14 @@
         <selectKey resultType="Long" order="BEFORE" keyProperty="id">
             SELECT SEQ_POST.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_POST(ID, POST_TITLE, POST_CONTENT, MEMBER_ID, CATEGORY_ID)
-        VALUES (#{id}, #{postTitle}, #{postContent}, #{memberId}, #{categoryId})
+        INSERT INTO TBL_POST(ID, POST_TITLE, POST_CONTENT, MEMBER_ID, CATEGORY_ID, POST_THUMBNAIL_URL)
+        VALUES (#{id}, #{postTitle}, #{postContent}, #{memberId}, #{categoryId}, #{postThumbnailUrl})
     </insert>
 
     <!-- 게시글 수정 -->
     <update id="update" parameterType="PostUpdateRequestDTO">
         UPDATE TBL_POST
-        SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, CATEGORY_ID= #{categoryId}
+        SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, CATEGORY_ID= #{categoryId}, POST_THUMBNAIL_URL = #{postThumbnailUrl}
         WHERE ID = #{id}
     </update>
 
@@ -521,4 +521,18 @@
                 TBP.CATEGORY_ID
         ) TBS ON TBP.ID = TBS.POST_ID
     </select>
+
+    <!-- 기존 게시글 썸네일 일괄 업데이트 -->
+    <select id="selectPostsWithoutThumbnail" resultType="PostVO">
+        SELECT ID, POST_CONTENT FROM TBL_POST
+        WHERE POST_THUMBNAIL_URL IS NULL
+          AND POST_DELETED_AT IS NULL
+          AND POST_CONTENT IS NOT NULL
+    </select>
+
+    <update id="updateThumbnailById" parameterType="PostVO">
+        UPDATE TBL_POST
+        SET POST_THUMBNAIL_URL = #{postThumbnailUrl}
+        WHERE ID = #{id}
+    </update>
 </mapper>

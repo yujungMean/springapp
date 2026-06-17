@@ -20,4 +20,8 @@ public interface GuestbookReplyMapper {
     void deleteRerepliesByReplyId(Long replyId);
 
     void deleteLikeByReplyId(Long replyId);
+
+    void softDelete(GuestbookReplyVO guestbookReplyVO);
+
+    int countRerepliesByReplyId(Long replyId);
 }

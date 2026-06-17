@@ -247,9 +247,9 @@
             DELETE FROM TBL_LOG_PATTERN WHERE LOG_RESULT_ID IN (SELECT ID FROM TBL_LOG_RESULT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>);
             DELETE FROM TBL_LOG_ACTION_PLAN WHERE LOG_RESULT_ID IN (SELECT ID FROM TBL_LOG_RESULT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>);
 
-            <!-- 2. TBL_PROJECT 자식들 삭제 -->
-            DELETE FROM TBL_CHECKLIST WHERE PROJECT_ID IN (SELECT ID FROM TBL_PROJECT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>);
+            <!-- 2. TBL_PROJECT 자식들 삭제 (TBL_SUGGESTION이 TBL_CHECKLIST를 참조하므로 먼저 삭제) -->
             DELETE FROM TBL_SUGGESTION WHERE PROJECT_ID IN (SELECT ID FROM TBL_PROJECT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>);
+            DELETE FROM TBL_CHECKLIST WHERE PROJECT_ID IN (SELECT ID FROM TBL_PROJECT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>);
 
             <!-- 3. TBL_LOG 직계 자식들 삭제 -->
             DELETE FROM TBL_LOG_RESULT WHERE LOG_ID IN <foreach item="id" collection="list" open="(" separator="," close=")">#{id}</foreach>;

@@ -43,4 +43,12 @@ public class GuestbookReplyDAO {
     public void deleteLikeByReplyId(Long replyId) {
         guestbookReplyMapper.deleteLikeByReplyId(replyId);
     }
+
+    public void softDelete(GuestbookReplyVO guestbookReplyVO) {
+        guestbookReplyMapper.softDelete(guestbookReplyVO);
+    }
+
+    public int countRerepliesByReplyId(Long replyId) {
+        return guestbookReplyMapper.countRerepliesByReplyId(replyId);
+    }
 }

@@ -44,6 +44,8 @@ public class PostServiceImpl implements PostService {
     @Value("${openai.model}")
     private String model;
 
+
+
     @Override
     public CommunityResponseDTO getCommunityInfo(Long id) {
         CommunityResponseDTO communityResponseDTO = new CommunityResponseDTO();
@@ -189,7 +191,16 @@ public class PostServiceImpl implements PostService {
     //게시글 수정
     @Override
     public void updatePost(PostUpdateRequestDTO postUpdateRequestDTO) {
+        postUpdateRequestDTO.setPostThumbnailUrl(extractFirstImageUrl(postUpdateRequestDTO.getPostContent()));
         postDAO.update(postUpdateRequestDTO);
+    }
+
+    private String extractFirstImageUrl(String html) {
+        if (html == null || html.isEmpty()) return null;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("<img[^>]+src\\s*=\\s*[\"']([^\"']+)[\"']", java.util.regex.Pattern.CASE_INSENSITIVE)
+                .matcher(html);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
     //게시글 조회수 증가

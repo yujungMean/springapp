@@ -81,6 +81,21 @@
         OR OWNER_MEMBER_ID = #{ownerMemberId})
     </delete>
 
+<!--    방명록 소프트 삭제 (내용만 변경) -->
+    <update id="softDelete" parameterType="GuestbookVO">
+        UPDATE TBL_GUESTBOOK
+        SET GUESTBOOK_CONTENT = '삭제된 댓글입니다.'
+        WHERE ID = #{id}
+        AND (WRITER_MEMBER_ID = #{writerMemberId}
+        OR OWNER_MEMBER_ID = #{ownerMemberId})
+    </update>
+
+<!--    방명록에 달린 답글 수 조회 -->
+    <select id="countRepliesByGuestbookId" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM TBL_GUESTBOOK_REPLY
+        WHERE GUESTBOOK_ID = #{guestbookId}
+    </select>
+
     <!-- 방명록에 속한 대댓글 좋아요 일괄 삭제 -->
     <delete id="deleteRereplyLikesByGuestbookId" parameterType="Long">
         DELETE FROM TBL_GUESTBOOK_REREPLY_LIKE

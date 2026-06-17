@@ -61,11 +61,12 @@ public class GuestbookServiceImpl implements GuestbookService {
     @Transactional
     public void deleteGuestbook(GuestbookVO guestbookVO) {
         Long guestbookId = guestbookVO.getId();
-        guestbookDAO.deleteRereplyLikesByGuestbookId(guestbookId);
-        guestbookDAO.deleteRerepliesByGuestbookId(guestbookId);
-        guestbookDAO.deleteReplyLikesByGuestbookId(guestbookId);
-        guestbookDAO.deleteRepliesByGuestbookId(guestbookId);
-        guestbookDAO.deleteLikesByGuestbookId(guestbookId);
-        guestbookDAO.deleteGuestbookByWriterMemberIdAndOwnerMemberId(guestbookVO);
+        int replyCount = guestbookDAO.countRepliesByGuestbookId(guestbookId);
+        if (replyCount > 0) {
+            guestbookDAO.softDelete(guestbookVO);
+        } else {
+            guestbookDAO.deleteLikesByGuestbookId(guestbookId);
+            guestbookDAO.deleteGuestbookByWriterMemberIdAndOwnerMemberId(guestbookVO);
+        }
     }
 }

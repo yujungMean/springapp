@@ -25,12 +25,24 @@ public class PostCreateDTO {
     @Schema(description = "작성자 id", example = "1", required = true)
     private Long MemberId;
 
+    @Schema(description = "게시글 썸네일 URL", example = "https://example.com/image.jpg")
+    private String postThumbnailUrl;
+
     public static PostCreateDTO from(PostCreateRequestDTO postCreateRequestDTO) {
         PostCreateDTO postCreateDTO = new PostCreateDTO();
         postCreateDTO.setPostTitle(postCreateRequestDTO.getPostTitle());
         postCreateDTO.setPostContent(postCreateRequestDTO.getPostContent());
         postCreateDTO.setCategoryId(postCreateRequestDTO.getCategoryId());
         postCreateDTO.setMemberId(postCreateRequestDTO.getMemberId());
+        postCreateDTO.setPostThumbnailUrl(extractFirstImageUrl(postCreateRequestDTO.getPostContent()));
         return postCreateDTO;
+    }
+
+    private static String extractFirstImageUrl(String html) {
+        if (html == null || html.isEmpty()) return null;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("<img[^>]+src\\s*=\\s*[\"']([^\"']+)[\"']", java.util.regex.Pattern.CASE_INSENSITIVE)
+                .matcher(html);
+        return matcher.find() ? matcher.group(1) : null;
     }
 }

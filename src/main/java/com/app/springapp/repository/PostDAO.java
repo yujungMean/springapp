@@ -121,4 +121,12 @@ public class PostDAO {
     public PostListResponseDTO findByMemberIdAndPostId(PostVO postVO) {
         return postMapper.selectByMemberIdAndPostId(postVO);
     }
+
+    public List<PostVO> findPostsWithoutThumbnail() {
+        return postMapper.selectPostsWithoutThumbnail();
+    }
+
+    public void updateThumbnailById(PostVO postVO) {
+        postMapper.updateThumbnailById(postVO);
+    }
 }

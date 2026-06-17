@@ -75,4 +75,8 @@ public interface PostMapper {
     public List<PostVO> selectIdAndPostContentExceptId(Long id);
 
     public PostListResponseDTO selectByMemberIdAndPostId(PostVO postVO);
+
+    public List<PostVO> selectPostsWithoutThumbnail();
+
+    public void updateThumbnailById(PostVO postVO);
 }

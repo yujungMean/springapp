@@ -66,4 +66,12 @@ public class GuestbookDAO {
     public void deleteLikesByGuestbookId(Long guestbookId) {
         guestbookMapper.deleteLikesByGuestbookId(guestbookId);
     }
+
+    public void softDelete(GuestbookVO guestbookVO) {
+        guestbookMapper.softDelete(guestbookVO);
+    }
+
+    public int countRepliesByGuestbookId(Long guestbookId) {
+        return guestbookMapper.countRepliesByGuestbookId(guestbookId);
+    }
 }

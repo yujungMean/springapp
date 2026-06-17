@@ -31,4 +31,8 @@ public interface GuestbookMapper {
     void deleteRepliesByGuestbookId(Long guestbookId);
 
     void deleteLikesByGuestbookId(Long guestbookId);
+
+    void softDelete(GuestbookVO guestbookVO);
+
+    int countRepliesByGuestbookId(Long guestbookId);
 }

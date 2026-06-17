@@ -37,9 +37,12 @@ public class GuestbookReplyServiceImpl implements GuestbookReplyService {
     @Transactional
     public void deleteReply(GuestbookReplyVO guestbookReplyVO) {
         Long replyId = guestbookReplyVO.getId();
-        guestbookReplyDAO.deleteRereplyLikesByReplyId(replyId);
-        guestbookReplyDAO.deleteRerepliesByReplyId(replyId);
-        guestbookReplyDAO.deleteLikeByReplyId(replyId);
-        guestbookReplyDAO.deleteReply(guestbookReplyVO);
+        int rereplyCount = guestbookReplyDAO.countRerepliesByReplyId(replyId);
+        if (rereplyCount > 0) {
+            guestbookReplyDAO.softDelete(guestbookReplyVO);
+        } else {
+            guestbookReplyDAO.deleteLikeByReplyId(replyId);
+            guestbookReplyDAO.deleteReply(guestbookReplyVO);
+        }
     }
 }

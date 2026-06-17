@@ -109,6 +109,7 @@ public class MemberServiceImpl implements MemberService {
         MemberVO memberVO = new MemberVO();
         memberVO.setId(id);
         memberVO.setMemberNickname(memberUpdateRequestDTO.getMemberNickname());
+        memberVO.setMemberName(memberUpdateRequestDTO.getMemberName());
         memberVO.setMemberProfileImageUrl(memberUpdateRequestDTO.getMemberProfileImageUrl());
         memberVO.setMemberPhone(memberUpdateRequestDTO.getMemberPhone());
         if (Boolean.TRUE.equals(memberUpdateRequestDTO.getVerifyPhone())) {

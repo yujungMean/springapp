@@ -20,4 +20,7 @@ public class PostUpdateRequestDTO {
 
     @Schema(description = "카테고리 ID", example = "2", required = true)
     private Long categoryId;
+
+    @Schema(description = "게시글 썸네일 URL", example = "https://example.com/image.jpg")
+    private String postThumbnailUrl;
 }
