@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
     private final AuthService authService;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -91,6 +93,9 @@ public class SecurityConfig {
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .oauth2Login(oauth2 -> oauth2
+                    .authorizationEndpoint(authorization -> authorization
+                            .authorizationRequestResolver(new CustomAuthorizationRequestResolver(clientRegistrationRepository))
+                    )
                     .successHandler(oauth2LoginSuccessHandler)
                     .failureHandler((request, response, exception) -> {
                         log.error("[소셜 로그인 실패]: {}", exception.getMessage());

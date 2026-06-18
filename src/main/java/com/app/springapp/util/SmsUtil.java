@@ -12,6 +12,7 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,7 +39,8 @@ public class SmsUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
     }
 
-    public SingleMessageSentResponse sendOneMemberPhone(String to, String content){
+    @Async
+    public void sendOneMemberPhone(String to, String content){
         Message message = new Message();
 
         // "01012341234" <- 형태로 전송해야 함.
@@ -48,13 +50,11 @@ public class SmsUtil {
         message.setFrom("01076666677");
         message.setText(content);
 
-        SingleMessageSentResponse response = this
-                .messageService
-                .sendOne(new SingleMessageSendingRequest(message));
-        return response;
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
     // 이메일 전송
+    @Async
     public void sendMemberEmail(String to, String subject, String content){
         MimeMessage mineMessage = mailSender.createMimeMessage();
 

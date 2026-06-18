@@ -66,7 +66,8 @@ public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             MemberDTO memberDTO = new MemberDTO();
             memberDTO.setMemberEmail(memberEmail);
             memberDTO.setSocialMemberProviderId(socialMemberProviderId);
-            memberDTO.setMemberName(memberName);
+            memberDTO.setMemberName(memberName != null ? memberName : "소셜회원");
+            memberDTO.setMemberPhone("000-0000-0000");
             memberDTO.setSocialMemberProvider(socialMemberProvider);
 
             // 닉네임 초기값: 이메일의 @ 앞부분으로 설정

@@ -270,11 +270,15 @@ public class AuthServiceImpl implements AuthService {
     public boolean sendMemberPhoneVerificationCode(String memberPhone) {
         try {
             String code = AuthCodeGenerator.generateAuthCode();
-            String message = "[FAIL LOG]\n인증코드를 입력해주세요.\n[" + code + "]";
-            smsUtil.sendOneMemberPhone(memberPhone, message);
+            // String message = "[FAIL LOG]\n인증코드를 입력해주세요.\n[" + code + "]";
 
             String key = "phone:" + memberPhone;
             redisTemplate.opsForValue().set(key, code, 3, TimeUnit.MINUTES);
+
+            // smsUtil.sendOneMemberPhone(memberPhone, message);
+            log.info("============================");
+            log.info("[SMS 인증] 휴대폰: {}, 인증코드: {}", memberPhone, code);
+            log.info("============================");
             return true;
         } catch (Exception e) {
             log.error("[SMS 인증] 발송/저장 실패: {}", e.getMessage());
@@ -301,17 +305,19 @@ public class AuthServiceImpl implements AuthService {
     public boolean sendMemberEmailVerificationCode(String memberEmail) {
         try {
             String code = AuthCodeGenerator.generateAuthCode();
-            String subject = "[FAIL LOG] 이메일 인증 코드";
-            String content = "[FAIL LOG]\n이메일 인증 코드를 입력해주세요.\n[" + code + "]";
-
-            smsUtil.sendMemberEmail(memberEmail, subject, content);
+            // String subject = "[FAIL LOG] 이메일 인증 코드";
+            // String content = "[FAIL LOG]\n이메일 인증 코드를 입력해주세요.\n[" + code + "]";
 
             String key = "email:" + memberEmail;
             redisTemplate.opsForValue().set(key, code, 3, TimeUnit.MINUTES);
-            log.info("[이메일 인증] 저장 완료 - key: {}, code: {}", key, code);
+
+            // smsUtil.sendMemberEmail(memberEmail, subject, content);
+            log.info("============================");
+            log.info("[이메일 인증] 이메일: {}, 인증코드: {}", memberEmail, code);
+            log.info("============================");
             return true;
         } catch (Exception e) {
-            log.error("[이메일 인증] 발송/저장 실패: {}", e.getMessage());
+            log.error("[이메일 인증] 발송/저장 실패: {}", e.getMessage(), e);
             return false;
         }
     }
